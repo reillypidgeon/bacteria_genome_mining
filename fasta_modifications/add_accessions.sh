@@ -3,7 +3,7 @@
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A directory containing one or more fasta files"
     echo "Usage: $0 <fasta_directory>"
@@ -14,3 +14,8 @@ fi
 fasta_dir="$1"
 
 
+or file in *.fasta; do
+    name="${file%.fasta}"
+    echo $name
+    #sed "s/^>/>${name}_/" "$file" > "${name}_modified.fasta"
+done
