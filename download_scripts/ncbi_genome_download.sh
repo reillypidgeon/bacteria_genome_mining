@@ -4,7 +4,7 @@ echo "Running $0"
 echo "This script downloads genome fasta files from the NCBI based on a user-defined table containing accessions and assemblies."
 echo "These are used to build a URL that can access the NCBI FTP site."
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A tab-separated file containing a column with NCBI accession and a column with the NCBI assembly."
     echo "Example line: GB_GCA_048366555.1  ASM4836655v1"
