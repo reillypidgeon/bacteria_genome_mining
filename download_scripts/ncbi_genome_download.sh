@@ -6,7 +6,7 @@ echo "These are used to build a URL that can access the NCBI FTP site."
 
 if [ "$#" -ne 2 ]; then
     echo "Error: Invalid number of arguments."
-    echo "A tab-separated file containing a column with NCBI accession and a column with the NCBI assembly."
+    echo "Required: A tab-separated file containing a column with NCBI accession and a column with the NCBI assembly."
     echo "Example line: GB_GCA_048366555.1  ASM4836655v1"
     echo "Usage: $0 <accessions_filename>"
     exit 1
