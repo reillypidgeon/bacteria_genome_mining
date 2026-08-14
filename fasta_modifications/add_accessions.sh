@@ -14,7 +14,7 @@ fi
 fasta_dir="$1"
 
 
-or file in *.fasta; do
+for file in *.fna; do
     name="${file%.fasta}"
     echo $name
     #sed "s/^>/>${name}_/" "$file" > "${name}_modified.fasta"
