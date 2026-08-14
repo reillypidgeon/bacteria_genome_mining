@@ -12,10 +12,12 @@ fi
 
 # Define the accessions variable based on the user input file
 fasta_dir=$(basename "$1")
+cd "$fasta_dir"
 
 # Loop through fasta files, which all end with .fna
-for file in ${fasta_dir}/*.fna; do
+# Add the accession after the > and write a new file for each genome
+for file in *.fna; do
     name="${file%.fna}"
-    echo $name
-    #sed "s/^>/>${name}_/" "$file" > "${name}_modified.fasta"
+    accession=$(echo $name | grep -Eo "^GC[A,F]_[[:digit:]]{9}\.1")
+    sed "s/^>/>${accession}-/" "$file" > "${name}_acc.fna"
 done
