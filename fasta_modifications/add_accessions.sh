@@ -11,11 +11,11 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Define the accessions variable based on the user input file
-fasta_dir="$1"
+fasta_dir=$(basename "$1")
 
-
-for file in *.fna; do
-    name="${file%.fasta}"
+# Loop through fasta files, which all end with .fna
+for file in ${fasta_dir}/*.fna; do
+    name="${file%.fna}"
     echo $name
     #sed "s/^>/>${name}_/" "$file" > "${name}_modified.fasta"
 done
