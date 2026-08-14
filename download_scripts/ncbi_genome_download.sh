@@ -44,3 +44,6 @@ cd genomes
 
 # Download the genomes into the newly-created directory
 cat ../urls.txt | parallel -j 8 wget -nc
+
+# Unzip the files
+gunzip *.fna.gz
