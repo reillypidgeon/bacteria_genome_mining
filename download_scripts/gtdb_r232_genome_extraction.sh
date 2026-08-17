@@ -7,7 +7,7 @@ if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A taxon according to GTDB taxonomy"
     echo "Usage: $0 <taxon_string>"
-    echo "Example: 'g__Enterocloster'"
+    echo "Example: $0 'g__Enterocloster'"
     exit 1
 fi
 
