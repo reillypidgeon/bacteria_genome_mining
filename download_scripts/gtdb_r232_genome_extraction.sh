@@ -14,12 +14,13 @@ fi
 module load python/3.14.2 scipy-stack/2026a
 
 # Define a function that will extract the accession, ncbi_assembly_name, and gtdb_taxonomy columns from the GTDB metadata table
+# This table can be reused for other analyses, so it's a good idea to save it
 gtdb_accessions_assemblies() {
   python3 << 'EOF'
   import pandas as pd
   # Read the table and keep the desired columns
   df = pd.read_csv("bac120_metadata_r232.tsv", sep='\t')
-  df_acc = df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy']]
+  df_acc = df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'ncbi_isolate']]
   # Write the output to a TSV file
   df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
   print("Extracted columns of interest from metadata table")
@@ -46,4 +47,23 @@ else
   gtdb_accessions_assemblies  
 fi
 
-# Now extract the accessions and assemblies that match to a partial string (user input)
+# Now extract the accessions and assemblies that match a partial string (user input: $1)
+taxon="$1"
+export taxon
+
+python3 << 'EOF'
+import pandas as pd
+import os
+
+taxon_string = os.environ.get('taxon')
+print(f"Searching the metadata table for: {taxon_string}")
+df = pd.read_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False)]
+
+# Now remove the taxonomy and ncbi_isolate columns and export without headers
+df_genomes = df[['accession', 'ncbi_assembly_name']]
+df_genomes.to_csv("genomes_r232.tsv", sep='\t', header=False, index=False)
+
+EOF
+
+echo "The resulting genomes_r232.tsv file can be used as input for the ncbi_genome_download.sh script"
