@@ -38,7 +38,7 @@ for fasta_file in "$@"; do
 	
 	# Extract the path to the fasta file(s) and create an output directory
 	fasta_dir=$(dirname "${fasta_file}")
-	out_dir="${fasta_dir}/prodigal_out"
+	out_dir="${fasta_dir}/pyrodigal_out"
 	mkdir -p "${out_dir}"
 	
 	# Remove the trailing file extension and extract the fasta identity
@@ -53,7 +53,7 @@ for fasta_file in "$@"; do
 	fi
 	
 	# Check if annotation already exists
-	if [ -f "${out_dir}/${fasta_id}_prodigal_prot.faa" ]; then
+	if [ -f "${out_dir}/${fasta_id}_pyrodigal_prot.faa" ]; then
 		echo "Annotations already exist. Skipping..."
 		continue
 	fi
@@ -61,11 +61,11 @@ for fasta_file in "$@"; do
 	pyrodigal -i "${fasta_file}" \
 	-p meta \
 	-g 11 \
-	-a "${out_dir}/${fasta_id}_prodigal_prot.faa" \
-	-d "${out_dir}/${fasta_id}_prodigal_gene.fna" \
+	-a "${out_dir}/${fasta_id}_pyrodigal_prot.faa" \
+	-d "${out_dir}/${fasta_id}_pyrodigal_gene.fna" \
 	-j $SLURM_CPUS_PER_TASK
 
-	echo "Finished running prodigal on ${fasta_id}"
+	echo "Finished running pyrodigal on ${fasta_id}"
 done
 
 date
