@@ -1,0 +1,2 @@
+archspec==0.2.5+computecanada
+pyrodigal==3.5.2+computecanada
