@@ -5,6 +5,8 @@ set -euo pipefail
 echo "Running $0"
 echo "This script downloads genome fasta files from the NCBI based on a user-defined table containing accessions and assemblies."
 echo "These are used to build a URL that can access the NCBI FTP site."
+echo
+echo "Important: This script requires internet access to fetch the genomes"
 
 if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments."
