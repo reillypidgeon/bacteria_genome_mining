@@ -7,7 +7,7 @@ echo "This script extracts accession and assembly codes from the GTDB release 23
 
 if [ "$#" -lt 1 ]; then
     echo "Error: Invalid number of arguments."
-    echo "Required: A taxon according to GTDB taxonomy"
+    echo "Required: A taxon according to GTDB taxonomy and an optional flag (-d) to download"
     echo "Usage: $0 -t <taxon_string> [-d]"
     echo "Example: $0 -t 'g__Enterocloster'"
     exit 1
@@ -15,14 +15,22 @@ fi
 
 # Initialize variables
 taxon=""
-download=false
+download_boolean=false
 
 # Define flags
 while getopts ":t:d" opt; do
   case ${opt} in
     t )
       taxon="$OPTARG"
-      if
+      if [[ $taxon =~ ^[kpcofgs]__ ]]; then 
+          echo "The taxon is valid: ${taxon}"
+      else
+          echo "The taxon name is not valid"
+          echo "Please provide a taxon starting with either of the following:"
+          echo "k__ p__ c__ o__ f__ g__ s__"
+          echo "Example: -t g__Enterocloster"
+          exit 1
+      fi
       ;;
     d )
       download_boolean=true
