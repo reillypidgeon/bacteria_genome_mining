@@ -67,7 +67,7 @@ gtdb_accessions_assemblies() {
   df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
   print("Extracted columns of interest from metadata table")
   
-  EOF
+EOF
 }
 
 # Check if the filtered metadata file already exists or prepare it
