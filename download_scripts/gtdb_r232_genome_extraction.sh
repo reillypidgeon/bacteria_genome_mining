@@ -5,13 +5,45 @@ set -euo pipefail
 echo "Running $0"
 echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input."
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A taxon according to GTDB taxonomy"
-    echo "Usage: $0 <taxon_string>"
-    echo "Example: $0 'g__Enterocloster'"
+    echo "Usage: $0 -t <taxon_string> [-d]"
+    echo "Example: $0 -t 'g__Enterocloster'"
     exit 1
 fi
+
+# Initialize variables
+taxon=""
+download=false
+
+# Define flags
+while getopts ":t:d" opt; do
+  case ${opt} in
+    t )
+      taxon="$OPTARG"
+      if
+      ;;
+    d )
+      download_boolean=true
+      ;;
+    \? )
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    : )
+      echo "Invalid option: -$OPTARG requires an argument" >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Shift off parsed options so $1, $2, etc., refer to remaining non-flag arguments
+shift $((OPTIND -1))
+
+echo "Taxon of interest to download: $taxon"
+echo "Download after producing the accessions table: $download_boolean"
+echo "Remaining arguments: $@"
 
 module load python/3.14.2 scipy-stack/2026a
 
@@ -49,8 +81,7 @@ else
   gtdb_accessions_assemblies  
 fi
 
-# Now extract the accessions and assemblies that match a partial string (user input: $1)
-taxon="$1"
+# Now extract the accessions and assemblies that match a partial string (user input)
 export taxon
 
 python3 << 'EOF'
