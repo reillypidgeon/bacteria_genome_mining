@@ -7,6 +7,8 @@
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=4
 
+set -euo pipefail
+
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
