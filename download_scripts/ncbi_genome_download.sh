@@ -28,11 +28,11 @@ while IFS= read -r line
 do
   base_url="https://ftp.ncbi.nlm.nih.gov/genomes/all"
   gb_rs=$(echo $line | grep -o "GC[A,F]")
-  accession_numbers=$(echo $line | grep -Eo "[[:digit:]]{9}")
+  accession=$(echo $line | grep -Eo "GC[A,F]_[[:digit:]]{9}\.1")
+  accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
   first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
   second_three=$(echo $accession_numbers | grep -oP "(?<=^[0-9]{3})[0-9]{3}(?=[0-9]{3}$)")
   third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
-  accession=$(echo $line | grep -Eo "GC[A,F]_[[:digit:]]{9}\.1")
   assembly=$(echo $line | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
