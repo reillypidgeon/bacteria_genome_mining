@@ -105,7 +105,7 @@ df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=Fals
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
 df_genomes = df_taxon[['accession', 'ncbi_assembly_name']]
 # Replace spaces with underscores to avoid errors in later steps
-df['ncbi_assembly_name'] = df['ncbi_assembly_name'].str.replace(' ', '_')
+df_genomes['ncbi_assembly_name'] = df_genomes['ncbi_assembly_name'].str.replace(' ', '_')
 file_name = f"genomes_{taxon_string}_r232.tsv".replace(" ", "_")
 df_genomes.to_csv(file_name, sep='\t', header=False, index=False)
 
