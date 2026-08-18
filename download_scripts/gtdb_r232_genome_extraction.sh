@@ -58,15 +58,14 @@ module load python/3.14.2 scipy-stack/2026a
 # Define a function that will extract the accession, ncbi_assembly_name, and gtdb_taxonomy columns from the GTDB metadata table
 # This table can be reused for other analyses, so it's a good idea to save it
 gtdb_accessions_assemblies() {
-  python3 << 'EOF'
-  import pandas as pd
-  # Read the table and keep the desired columns
-  df = pd.read_csv("bac120_metadata_r232.tsv", sep='\t')
-  df_acc = df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'ncbi_isolate']]
-  # Write the output to a TSV file
-  df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
-  print("Extracted columns of interest from metadata table")
-  
+python3 << 'EOF'
+import pandas as pd
+# Read the table and keep the desired columns
+df = pd.read_csv("bac120_metadata_r232.tsv", sep='\t')
+df_acc = df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'ncbi_isolate']]
+# Write the output to a TSV file
+df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+print("Extracted columns of interest from metadata table")
 EOF
 }
 
