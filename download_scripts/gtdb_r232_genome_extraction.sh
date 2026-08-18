@@ -10,6 +10,7 @@ if [ "$#" -lt 1 ]; then
     echo "Required: A taxon according to GTDB taxonomy and an optional flag (-d) to download"
     echo "Usage: $0 -t <taxon_string> [-d]"
     echo "Example: $0 -t 'g__Enterocloster'"
+    echo "Example: $0 -t 's__Enterocloster asparagiformis' -d"
     exit 1
 fi
 
