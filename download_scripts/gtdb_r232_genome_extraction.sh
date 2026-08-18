@@ -109,7 +109,7 @@ df_genomes.to_csv(f"genomes_{taxon_string}_r232.tsv", sep='\t', header=False, in
 EOF
 
 # Check if the download flag is true and call the download script
-if [ download_boolean -eq true ]; then
+if [ $download_boolean == true ]; then
     echo "Genomes will be downloaded using the ncbi_genome_download.sh script"
     bash ncbi_genome_download.sh "genomes_${taxon}_r232.tsv"
 else
