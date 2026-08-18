@@ -103,13 +103,16 @@ df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=Fals
 
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
 df_genomes = df[['accession', 'ncbi_assembly_name']]
-df_genomes.to_csv(f"genomes_{taxon_string}_r232.tsv", sep='\t', header=False, index=False)
+file_name = f"genomes_{taxon_string}_r232.tsv".replace(" ", "_")
+df_genomes.to_csv(file_name, sep='\t', header=False, index=False)
 
 EOF
 
 # Check if the download flag is true and call the download script
 if [ $download_boolean == true ]; then
     echo "Genomes will be downloaded using the ncbi_genome_download.sh script"
+    # In case a species was given ,this would replace the space with an underscore
+    taxon=$(echo $taxon | tr ' ' '_')
     bash ncbi_genome_download.sh "genomes_${taxon}_r232.tsv"
 else
     echo "The genomes file containing accessions and assemblies can now be separately passed to the ncbi_genome_download.sh script"
