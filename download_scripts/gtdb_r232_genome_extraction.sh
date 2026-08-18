@@ -66,6 +66,7 @@ gtdb_accessions_assemblies() {
   # Write the output to a TSV file
   df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
   print("Extracted columns of interest from metadata table")
+  
   EOF
 }
 
