@@ -12,10 +12,10 @@ set -euo pipefail
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -lt 2 ]; then
     echo "Error: Invalid number of arguments."
-    echo "Required: FASTA files of the query and subject (target)"
-    echo "Usage: $0 <query_fasta> <subject_fasta>"
+    echo "Required: FASTA files of the query and subject(s)"
+    echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
     exit 1
 fi
 
@@ -23,7 +23,7 @@ module load StdEnv/2023 mmseqs2/17-b804f cudacore/.12.6.3
 
 # Assign command line arguments
 query_fasta="$1"
-subject_fasta="$2" 
+subject_fasta="${@:2}" 
 
 if [ $subject_fasta == "*.faa" ]; then
     echo "Protein subject/database"
