@@ -10,38 +10,109 @@
 set -euo pipefail
 
 echo "Running $0"
-echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
+echo "This script searches a query FASTA file against subject FASTA file(s)."
 
 if [ "$#" -lt 2 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: FASTA files of the query and subject(s)"
     echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
+    echo
+    echo "Example: $0 queries.fna genomes/*.fna"
+    echo "Example: $0 queries.faa genomes/proteins/*.faa"
     exit 1
 fi
 
 module load StdEnv/2023 mmseqs2/17-b804f cudacore/.12.6.3
 
-# Assign command line arguments
+# Assign command line argument for the query
 query_fasta="$1"
-subject_fasta="${@:2}" 
 
-if [ $subject_fasta == "*.faa" ]; then
-    echo "Protein subject/database"
-    out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
-else
-    out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq"
-fi
+# Create an output directory
+out_dir="mmseqs2_out"
+mkdir -p "${out_dir}"
 
-# Run the search (auto-detects the input fasta formats)
-mmseqs easy-search \
-    $query_fasta \
-    $subject_fasta \
-    mmseqs_results.tsv \
-    tmp \
-    --threads $SLURM_CPUS_PER_TASK \
-    --format-output $out_format
+# Assign the output format
+out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
+
+# Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
+for subject_fasta in "${@:2}"; do
+    
+    # Convert name to lowercase
+    subject_fasta=$(echo "${subject_fasta}" | tr '[:upper:]' '[:lower:]')
+
+    # Extract the fasta identity
+    if [[ "${subject_fasta}" == *.fasta ]]; then
+        fasta_id=$(basename "${subject_fasta}" .fasta)
+    elif [[ "${subject_fasta}" == *.faa ]]; then
+        fasta_id=$(basename "${subject_fasta}" .faa)
+    elif [[ "${subject_fasta}" == *.fna ]]; then
+        fasta_id=$(basename "${subject_fasta}" .fna)
+    else
+        fasta_id=$(basename "${subject_fasta}")
+    fi
+    
+    # Run the search (auto-detects the input fasta formats)
+    mmseqs easy-search \
+        $query_fasta \
+        $subject_fasta \
+        "${out_dir}/${fasta_id}_mmseqs2.tsv" \
+        tmp \
+        --threads $SLURM_CPUS_PER_TASK \
+        --format-output $out_format \
+        --min-seq-id 0.5 \
+        -c 0.5
+done
 
 date
-echo "mmseqs search finished"
+echo "mmseqs2 search finished"
 
-# Add column headers based on the output format immediately
+# Add column headers based on the output format
+module load python/3.14.2 scipy-stack/2026a
+
+export out_format
+export out_dir
+
+python3 << 'EOF'
+import pandas as pd
+import os
+import glob
+import re
+
+# Generate a list for the headers
+output_format = os.environ.get('out_format')
+output_format = output_format.split(",")
+
+# Set the ouptout directory
+output_directory = os.environ.get('out_dir')
+
+print("Annotating output tables")
+
+# Generate an empty list to populate
+dfs = []
+
+# Loop through the results tables
+for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
+    df = pd.read_csv(file, sep="\t", header=None, names = output_format)
+    file_name = os.path.basename(file)
+    df["file_name"] = file_name
+    
+    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
+    df["accession"] = re.search(pattern, file_name).group(0)
+    dfs.append(df)
+
+# Merge the dataframes in dfs
+merged_df = pd.concat(dfs, ignore_index=True)
+merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
+
+# Export the resulting file to a TSV
+merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t")
+
+# Filter by best hit (for each target protein) and export to a TSV
+merged_df_bh = merged_df.loc[merged_df.groupby('target')['pident'].idxmax()]
+merged_df_bh = merged_df_bh.reset_index(drop=True)
+merged_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t")
+
+EOF
+
+echo "Finished mmseqs pipeline with annotations"
+date
