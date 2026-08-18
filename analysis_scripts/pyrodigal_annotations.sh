@@ -42,14 +42,14 @@ for fasta_file in "$@"; do
 	mkdir -p "${out_dir}"
 	
 	# Remove the trailing file extension and extract the fasta identity
-	lowercase_input=$(echo "${fasta_file}" | tr '[:upper:]' '[:lower:]')
+	fasta_file=$(echo "${fasta_file}" | tr '[:upper:]' '[:lower:]')
 
 	if [[ "${fasta_file}" == *.fasta ]]; then
-		fasta_id=$(basename "$lowercase_input" .fasta)
+		fasta_id=$(basename "${fasta_file}" .fasta)
 	elif [[ "${fasta_file}" == *.fna ]]; then
-		fasta_id=$(basename "$lowercase_input" .fna)
+		fasta_id=$(basename "${fasta_file}" .fna)
 	else
-		fasta_id=$(basename "$lowercase_input")
+		fasta_id=$(basename "${fasta_file}")
 	fi
 	
 	# Check if annotation already exists
