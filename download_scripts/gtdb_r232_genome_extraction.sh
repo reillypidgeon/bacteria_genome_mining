@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 echo "Running $0"
 echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input."
 
