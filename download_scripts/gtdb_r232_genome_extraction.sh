@@ -3,10 +3,10 @@
 set -euo pipefail
 
 echo "Running $0"
-echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input."
+echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input"
 
 if [ "$#" -lt 1 ]; then
-    echo "Error: Invalid number of arguments."
+    echo "Error: Invalid number of arguments"
     echo "Required: A taxon according to GTDB taxonomy and an optional flag (-d) to download"
     echo "Usage: $0 -t <taxon_string> [-d]"
     echo "Example: $0 -t 'g__Enterocloster'"
@@ -22,12 +22,14 @@ while getopts ":t:d" opt; do
   case ${opt} in
     t )
       taxon="$OPTARG"
-      if [[ $taxon =~ ^[kpcofgs]__ ]]; then 
+      if [[ $taxon =~ ^[kpcofgs]__[A-Z] ]]; then 
           echo "The taxon is valid: ${taxon}"
       else
           echo "The taxon name is not valid"
           echo "Please provide a taxon starting with either of the following:"
           echo "k__ p__ c__ o__ f__ g__ s__"
+          echo "Followed by the Uppercase taxon name"
+          echo "See https://gtdb.ecogenomic.org/tree?r=d__Bacteria "
           echo "Example: -t g__Enterocloster"
           exit 1
       fi
@@ -46,12 +48,10 @@ while getopts ":t:d" opt; do
   esac
 done
 
-# Shift off parsed options so $1, $2, etc., refer to remaining non-flag arguments
 shift $((OPTIND -1))
 
 echo "Taxon of interest to download: $taxon"
 echo "Download after producing the accessions table: $download_boolean"
-echo "Remaining arguments: $@"
 
 module load python/3.14.2 scipy-stack/2026a
 
@@ -103,8 +103,14 @@ df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=Fals
 
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
 df_genomes = df[['accession', 'ncbi_assembly_name']]
-df_genomes.to_csv("genomes_r232.tsv", sep='\t', header=False, index=False)
+df_genomes.to_csv(f"genomes_{taxon_string}_r232.tsv", sep='\t', header=False, index=False)
 
 EOF
 
-echo "The resulting genomes_r232.tsv file can be used as input for the ncbi_genome_download.sh script"
+# Check if the download flag is true and call the download script
+if [ download_boolean -eq true ]; then
+    echo "Genomes will be downloaded using the ncbi_genome_download.sh script"
+    bash ncbi_genome_download.sh "genomes_${taxon}_r232.tsv"
+else
+    echo "The genomes file containing accessions and assemblies can now be separately passed to the ncbi_genome_download.sh script"
+fi
