@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 echo "Running $0"
 echo "This script downloads genome fasta files from the NCBI based on a user-defined table containing accessions and assemblies."
 echo "These are used to build a URL that can access the NCBI FTP site."
