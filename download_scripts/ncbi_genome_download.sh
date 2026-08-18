@@ -18,8 +18,9 @@ fi
 
 # Define the accessions variable based on the user input file
 accessions="$1"
+echo "Looking into $accessions"
 path_to_accessions=$(dirname ${accessions})
-cd "$path_to_accessions"
+cd "${path_to_accessions}"
 
 
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
