@@ -103,7 +103,7 @@ df = pd.read_csv("bac120_metadata_r232_acc.tsv", sep='\t')
 df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False)]
 
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
-df_genomes = df[['accession', 'ncbi_assembly_name']]
+df_genomes = df_taxon[['accession', 'ncbi_assembly_name']]
 file_name = f"genomes_{taxon_string}_r232.tsv".replace(" ", "_")
 df_genomes.to_csv(file_name, sep='\t', header=False, index=False)
 
