@@ -74,7 +74,7 @@ export out_dir
 
 python3 << 'EOF'
 import pandas as pd
-import os, glon, re, fnmatch
+import os, glob, re, fnmatch
 from pathlib import Path
 
 # Generate a list for the headers
