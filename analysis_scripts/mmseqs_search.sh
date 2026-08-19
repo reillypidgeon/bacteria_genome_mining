@@ -94,8 +94,12 @@ dfs = []
 for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     df = pd.read_csv(file, sep="\t", header=None, names = output_format)
     file_name = os.path.basename(file)
-    
-    
+
+    # Extract the accession from the file_name and add to the dataframes
+    print("Extracting the accession")
+    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
+    accession = re.search(pattern, file_name).group(0)
+        
     # Check if the dataframe is empty
     if df.empty:
         print(f"Dataframe for {file_name} is empty")
@@ -105,16 +109,12 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
         df.loc[0] = {
             "file_name": file_name,
             "pident": 0,
-            "target": "NA"
+            "target": f"NA for {accession}"
         }
     else:
         print(f"Dataframe for {file_name} contains hits")
         df["file_name"] = file_name
-    
-    # Extract the accession from the file_name and add to the dataframes
-    print("Adding the accession")
-    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
-    df["accession"] = re.search(pattern, file_name).group(0)
+        df["accession"] = accession
     
     # Append the df to the list of dfs and go through the loop again
     print("Appending to the list of dfs")
