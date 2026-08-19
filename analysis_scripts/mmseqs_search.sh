@@ -116,7 +116,8 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
         # Add in the file_name in a single row
         df.loc[0] = {
             "file_name": file_name,
-            "pident": 0.0
+            "pident": 0.0,
+            "target": f"NA for {accession}"
         }
     else:
         print(f"Dataframe for {file_name} contains hits")
