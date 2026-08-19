@@ -139,8 +139,13 @@ merged_df = merged_df[output_format]
 # Now combine the merged dfs with the metadata table used to get the accessions and assemblies
 metadata_path = Path("bac120_metadata_r232.tsv")
 if metadata_path.is_file():
-    df_metadata = pd.read_csv(metadata_path, sep='\t')
-    df_metadata = df_metadata["accession", "gtdb_taxonomy"]
+    print("Merging with metadata")
+    metadata_df = pd.read_csv(metadata_path, sep='\t')
+    metadata_df = metadata_df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'gtdb_representative', 'ncbi_isolate', 'ncbi_strain_identifiers']]
+    metadata_df['accession'] = metadata_df['accession'].str.replace(r'[RG][SB]_', '', regex=True)
+    merged_metadata_df = pd.merge(merged_df, metadata_df, left_on='accession', right_on='accession')
+else:
+    print("Cannot find metadata table... exporting to TSV without metadata")
 
 # Filter by best hit (for each target protein) and export to a TSV
 merged_df_bh = merged_df.loc[merged_df.groupby('target')['pident'].idxmax()]
