@@ -105,6 +105,7 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     print(f"Extracting the accession for {file_name}")
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
     accession = re.search(pattern, file_name).group(0)
+    accession = accession.upper()
     print(accession)
     
     # Check if the dataframe is empty
