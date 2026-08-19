@@ -94,12 +94,12 @@ dfs = []
 for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     df = pd.read_csv(file, sep="\t", header=None, names = output_format)
     file_name = os.path.basename(file)
-
+    
     # Extract the accession from the file_name and add to the dataframes
     print("Extracting the accession")
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
     accession = re.search(pattern, file_name).group(0)
-        
+    
     # Check if the dataframe is empty
     if df.empty:
         print(f"Dataframe for {file_name} is empty")
