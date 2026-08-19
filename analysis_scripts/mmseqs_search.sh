@@ -147,13 +147,13 @@ if metadata_path.is_file():
 else:
     print("Cannot find metadata table... exporting to TSV without metadata")
 
-# Filter by best hit (for each target protein) and export to a TSV
-merged_df_bh = merged_df.loc[merged_df.groupby('target')['pident'].idxmax()]
-merged_df_bh = merged_df_bh.reset_index(drop=True)
+# Filter by best hit (for each target protein)
+merged_metadata_df_bh = merged_metadata_df.loc[merged_metadata_df.groupby('target')['pident'].idxmax()]
+merged_metadata_df_bh = merged_metadata_df_bh.reset_index(drop=True)
 
 # Export the resulting files to TSV
-merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
-merged_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t", index=False)
+merged_metadata_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
+merged_metadata_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t", index=False)
 
 
 EOF
