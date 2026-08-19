@@ -74,10 +74,8 @@ export out_dir
 
 python3 << 'EOF'
 import pandas as pd
-import os
-import glob
-import re
-import fnmatch
+import os, glon, re, fnmatch
+from pathlib import Path
 
 # Generate a list for the headers
 output_format = os.environ.get('out_format')
@@ -138,13 +136,20 @@ merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
 output_format.extend(["accession", "file_name"])
 merged_df = merged_df[output_format]
 
-# Export the resulting file to a TSV
-merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
+# Now combine the merged dfs with the metadata table used to get the accessions and assemblies
+metadata_path = Path("bac120_metadata_r232.tsv")
+if metadata_path.is_file():
+    df_metadata = pd.read_csv(metadata_path, sep='\t')
+    df_metadata = df_metadata["accession", "gtdb_taxonomy"]
 
 # Filter by best hit (for each target protein) and export to a TSV
 merged_df_bh = merged_df.loc[merged_df.groupby('target')['pident'].idxmax()]
 merged_df_bh = merged_df_bh.reset_index(drop=True)
+
+# Export the resulting files to TSV
+merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
 merged_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t", index=False)
+
 
 EOF
 
