@@ -94,23 +94,47 @@ dfs = []
 for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     df = pd.read_csv(file, sep="\t", header=None, names = output_format)
     file_name = os.path.basename(file)
-    df["file_name"] = file_name
     
+    
+    # Check if the dataframe is empty
+    if df.empty:
+        print(f"Dataframe for {file_name} is empty")
+        print("Adding a row")
+        df["file_name"] = None
+        # Add in the file_name in a single row
+        df.loc[0] = {
+            "file_name": file_name,
+            "pident": 0,
+            "target": "NA"
+        }
+    else:
+        print(f"Dataframe for {file_name} contains hits")
+        df["file_name"] = file_name
+    
+    # Extract the accession from the file_name and add to the dataframes
+    print("Adding the accession")
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
     df["accession"] = re.search(pattern, file_name).group(0)
+    
+    # Append the df to the list of dfs and go through the loop again
+    print("Appending to the list of dfs")
     dfs.append(df)
 
 # Merge the dataframes in dfs
 merged_df = pd.concat(dfs, ignore_index=True)
 merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
 
+# Reorder the columns according to an extended output_format list
+output_format.extend(["accession", "file_name"])
+merged_df = merged_df[output_format]
+
 # Export the resulting file to a TSV
-merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t")
+merged_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
 
 # Filter by best hit (for each target protein) and export to a TSV
 merged_df_bh = merged_df.loc[merged_df.groupby('target')['pident'].idxmax()]
 merged_df_bh = merged_df_bh.reset_index(drop=True)
-merged_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t")
+merged_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t", index=False)
 
 EOF
 
