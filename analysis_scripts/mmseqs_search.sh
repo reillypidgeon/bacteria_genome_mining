@@ -109,7 +109,8 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
         df.loc[0] = {
             "file_name": file_name,
             "pident": 0,
-            "target": f"NA for {accession}"
+            "target": f"NA for {accession}",
+            "accession": accession
         }
     else:
         print(f"Dataframe for {file_name} contains hits")
