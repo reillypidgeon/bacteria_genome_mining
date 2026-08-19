@@ -77,6 +77,7 @@ import pandas as pd
 import os
 import glob
 import re
+import fnmatch
 
 # Generate a list for the headers
 output_format = os.environ.get('out_format')
@@ -92,30 +93,36 @@ dfs = []
 
 # Loop through the results tables
 for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
-    df = pd.read_csv(file, sep="\t", header=None, names = output_format)
+    df = pd.read_csv(file, sep="\t", header=None, names = output_format, low_memory=False)
     file_name = os.path.basename(file)
     
+    # Skip merged results if present from a previous execution of this script
+    if fnmatch.fnmatch(file_name, "merged*mmseqs2.tsv"):
+        print("Skipping merged results")
+        continue
+    
     # Extract the accession from the file_name and add to the dataframes
-    print("Extracting the accession")
+    print(f"Extracting the accession for {file_name}")
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
     accession = re.search(pattern, file_name).group(0)
+    print(accession)
     
     # Check if the dataframe is empty
     if df.empty:
         print(f"Dataframe for {file_name} is empty")
         print("Adding a row")
         df["file_name"] = None
+        df["accession"] = None
         # Add in the file_name in a single row
         df.loc[0] = {
             "file_name": file_name,
-            "pident": 0,
-            "target": f"NA for {accession}",
-            "accession": accession
+            "pident": 0.0
         }
     else:
         print(f"Dataframe for {file_name} contains hits")
         df["file_name"] = file_name
-        df["accession"] = accession
+    
+    df["accession"] = accession
     
     # Append the df to the list of dfs and go through the loop again
     print("Appending to the list of dfs")
