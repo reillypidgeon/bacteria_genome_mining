@@ -44,6 +44,7 @@ mkdir -p genomes
 cd genomes
 
 # Download the genomes into the newly-created directory
+echo "Attempting to download the genomes"
 cat ../urls.txt | parallel -j 8 wget -nc
 
 # Unzip the files
