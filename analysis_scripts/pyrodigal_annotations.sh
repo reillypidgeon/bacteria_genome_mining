@@ -42,8 +42,6 @@ for fasta_file in "$@"; do
 	mkdir -p "${out_dir}"
 	
 	# Remove the trailing file extension and extract the fasta identity
-	fasta_file=$(echo "${fasta_file}" | tr '[:upper:]' '[:lower:]')
-
 	if [[ "${fasta_file}" == *.fasta ]]; then
 		fasta_id=$(basename "${fasta_file}" .fasta)
 	elif [[ "${fasta_file}" == *.fna ]]; then
