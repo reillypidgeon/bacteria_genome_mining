@@ -37,9 +37,6 @@ out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,
 # Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
 for subject_fasta in "${@:2}"; do
     
-    # Convert name to lowercase
-    subject_fasta=$(echo "${subject_fasta}" | tr '[:upper:]' '[:lower:]')
-
     # Extract the fasta identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
         fasta_id=$(basename "${subject_fasta}" .fasta)
@@ -141,7 +138,7 @@ metadata_path = Path("bac120_metadata_r232.tsv")
 if metadata_path.is_file():
     print("Merging with metadata")
     metadata_df = pd.read_csv(metadata_path, sep='\t')
-    metadata_df = metadata_df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'gtdb_representative', 'ncbi_isolate', 'ncbi_strain_identifiers']]
+    metadata_df = metadata_df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'gtdb_representative', 'ncbi_isolate', 'ncbi_strain_identifiers', 'ncbi_isolation_source']]
     metadata_df['accession'] = metadata_df['accession'].str.replace(r'[RG][SB]_', '', regex=True)
     merged_metadata_df = pd.merge(merged_df, metadata_df, left_on='accession', right_on='accession')
 else:
