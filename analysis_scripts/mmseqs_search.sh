@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 #SBATCH --job-name=mmseqs2
-#SBATCH --output=%x.out
-#SBATCH --error=%x.err
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
 #SBATCH --time=08:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=4
