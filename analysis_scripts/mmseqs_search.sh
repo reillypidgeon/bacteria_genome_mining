@@ -48,6 +48,14 @@ for subject_fasta in "${@:2}"; do
         fasta_id=$(basename "${subject_fasta}")
     fi
     
+    # Check if results file already exists
+	if [ -f "${out_dir}/${fasta_id}_mmseqs2.tsv" ]; then
+		echo "Results file already exists. Skipping..."
+		continue
+	fi
+
+    echo "Searching ${fasta_id} using mmseqs2"
+    
     # Run the search (auto-detects the input fasta formats)
     mmseqs easy-search \
         $query_fasta \
