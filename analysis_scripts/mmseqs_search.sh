@@ -50,7 +50,7 @@ for subject_fasta in "${@:2}"; do
 	
     # Check if results file already exists
 	if [ -f "${out_dir}/${fasta_id}_mmseqs2.tsv" ]; then
-		echo "Results file already exists. Skipping..."
+		echo "Results file for ${fasta_id} already exists. Skipping..."
 		continue
 	fi
 	
