@@ -53,7 +53,7 @@ for subject_fasta in "${@:2}"; do
 		echo "Results file already exists. Skipping..."
 		continue
 	fi
-
+	
     echo "Searching ${fasta_id} using mmseqs2"
     
     # Run the search (auto-detects the input fasta formats)
