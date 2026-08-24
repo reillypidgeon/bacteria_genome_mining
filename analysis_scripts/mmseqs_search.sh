@@ -36,10 +36,10 @@ out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,
 
 # Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
 for subject_fasta in "${@:2}"; do
-    
+	
     # Extract the fasta identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
-        fasta_id=$(basename "${subject_fasta}" .fasta)
+    	fasta_id=$(basename "${subject_fasta}" .fasta)
     elif [[ "${subject_fasta}" == *.faa ]]; then
         fasta_id=$(basename "${subject_fasta}" .faa)
     elif [[ "${subject_fasta}" == *.fna ]]; then
@@ -47,15 +47,15 @@ for subject_fasta in "${@:2}"; do
     else
         fasta_id=$(basename "${subject_fasta}")
     fi
-    
+	
     # Check if results file already exists
 	if [ -f "${out_dir}/${fasta_id}_mmseqs2.tsv" ]; then
 		echo "Results file already exists. Skipping..."
 		continue
 	fi
 	
-    echo "Searching ${fasta_id} using mmseqs2"
-    
+	echo "Searching ${fasta_id} using mmseqs2"
+	
     # Run the search (auto-detects the input fasta formats)
     mmseqs easy-search \
         $query_fasta \
@@ -98,7 +98,7 @@ dfs = []
 for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     df = pd.read_csv(file, sep="\t", header=None, names = output_format, low_memory=False)
     file_name = os.path.basename(file)
-    
+	
     # Skip merged results if present from a previous execution of this script
     if fnmatch.fnmatch(file_name, "merged*mmseqs2.tsv"):
         print("Skipping merged results")
