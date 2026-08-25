@@ -106,7 +106,7 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     
     # Extract the accession from the file_name and add to the dataframes
     print(f"Extracting the accession for {file_name}")
-    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.1"
+    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]"
     accession = re.search(pattern, file_name).group(0)
     accession = accession.upper()
     print(accession)
