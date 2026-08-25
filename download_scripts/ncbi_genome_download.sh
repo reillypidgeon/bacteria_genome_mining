@@ -53,7 +53,7 @@ gunzip *.fna.gz
 # Add the genome accessions to each fasta file
 if [ -f "fasta_modifications/add_accessions.sh" ]; then
     echo "fasta_modifications/add_accessions.sh script found"
-    bash fasta_modifications/add_accessions.sh
+    bash fasta_modifications/add_accessions.sh .
 else
     echo "fasta_modifications/add_accessions.sh script found"
     echo "Exiting script without any fasta modifications"
