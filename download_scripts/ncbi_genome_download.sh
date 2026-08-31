@@ -40,22 +40,22 @@ do
 done < $accessions
 
 # Create a new directory for the genomes that will be downloaded
-mkdir -p genomes
-cd genomes
+mkdir -p ../genomes
+cd ../genomes
 
 # Download the genomes into the newly-created directory
 echo "Attempting to download the genomes"
-cat ../urls.txt | parallel -j 8 wget -nc
+cat ../download_scripts/urls.txt | parallel -j 8 wget -nc
 
 # Unzip the files
 gunzip *.fna.gz
 
 # Add the genome accessions to each fasta file
-if [ -f "add_accessions.sh" ]; then
+if [ -f "../download_scripts/add_accessions.sh" ]; then
     echo "add_accessions.sh script found"
-    bash add_accessions.sh .
+    bash ../download_scripts/add_accessions.sh .
 else
-    echo "add_accessions.sh script found"
+    echo "add_accessions.sh script not found"
     echo "Exiting script without any fasta modifications"
     exit 1
 fi
