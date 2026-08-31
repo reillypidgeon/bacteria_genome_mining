@@ -17,7 +17,11 @@ Useful for looking at taxonomic distribution of genes (or proteins) and strain-l
 ## Usage
 The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table
 ```
-bash gtdb_r232_genome_extraction.sh
+# To create the url list for genomes belonging to a user-defined taxonomic level
+bash gtdb_r232_genome_extraction.sh -t g__Enterocloster
+
+# To download all the genomes
+bash gtdb_r232_genome_extraction.sh -t g__Enterocloster -d
 ```
 
 The goal is to have a single command that can download all genomes based on a string match to a GTDB phylogenetic level (e.g., "g__Enterocloster").
