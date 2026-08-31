@@ -17,8 +17,8 @@ if [ "$#" -lt 2 ]; then
     echo "Required: FASTA files of the query and subject(s)"
     echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
     echo
-    echo "Example: $0 queries.fna genomes/*.fna"
-    echo "Example: $0 queries.faa genomes/proteins/*.faa"
+    echo "Example: $0 queries.fna proteins/*.fna"
+    echo "Example: $0 queries.faa genomes/*.faa"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ module load StdEnv/2023 mmseqs2/17-b804f cudacore/.12.6.3
 query_fasta="$1"
 
 # Create an output directory
-out_dir="mmseqs2_out"
+out_dir="../mmseqs2_out"
 mkdir -p "${out_dir}"
 
 # Assign the output format
