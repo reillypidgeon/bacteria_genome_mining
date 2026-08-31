@@ -32,14 +32,13 @@ pip install --no-index --upgrade pip
 
 pip install --no-index -r pyrodigal_requirements.txt
 
+# Extract the path to the fasta file(s) and create an output directory
+out_dir="../pyrodigal_out"
+mkdir -p "${out_dir}"
+
 # Loop through the file(s)
 for fasta_file in "$@"; do
 	echo "Annotating ${fasta_file}"
-	
-	# Extract the path to the fasta file(s) and create an output directory
-	fasta_dir=$(dirname "${fasta_file}")
-	out_dir="pyrodigal_out"
-	mkdir -p "${out_dir}"
 	
 	# Remove the trailing file extension and extract the fasta identity
 	if [[ "${fasta_file}" == *.fasta ]]; then
