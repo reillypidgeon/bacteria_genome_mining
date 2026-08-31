@@ -5,6 +5,9 @@ To find homologous sequences (or lack thereof) in genomes for a given taxonomic 
 <br>
 Useful for looking at taxonomic distribution of genes (or proteins) and strain-level variation within species.
 
+> [!WARNING]
+> This repository is a work in progress - there may be bugs!
+
 ## Approach
 - Download genome fasta files (.fna) from the NCBI using GTDB (release 232) taxonomy based on user input
 - Annotate fasta files and predict protein-coding sequences using [pyrodigal](https://github.com/althonos/pyrodigal)
