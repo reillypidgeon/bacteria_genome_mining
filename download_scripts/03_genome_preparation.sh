@@ -3,8 +3,7 @@
 set -euo pipefail
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
-current_dir="$(pwd)"
-script_dir="$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname ${script_dir})"
 genomes_dir="${project_dir}/genomes"
 
