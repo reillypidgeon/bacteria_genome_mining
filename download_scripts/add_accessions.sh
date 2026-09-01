@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
@@ -11,8 +13,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Define the accessions variable based on the user input file
-genomes_dir=$(basename "$1")
-cd "$genomes_dir"
+cd "$1"
 
 # Loop through fasta files, which all end with .fna
 # Add the accession after the > and write a new file for each genome
