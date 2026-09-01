@@ -20,11 +20,11 @@ Useful for looking at taxonomic distribution of genes (or proteins) and strain-l
 The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
 ```
 # To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
-bash genome_extraction.sh -t g__Enterocloster
+bash genome_extraction.sh -t "g__Enterocloster"
 # To download the genomes from the created table
-bash genome_download.sh 
+bash genome_download.sh "genomes_g__Enterocloster_r232.tsv"
 
-# To do both in one line, add the -d flag to genome_extraction.sh
-bash genome_extraction.sh -t g__Enterocloster -d
+# To do both in one line, add the -d flag to genome_extraction.sh, which will automatically call the genome_download.sh script
+bash genome_extraction.sh -t "g__Enterocloster" -d
 ```
 <br>
