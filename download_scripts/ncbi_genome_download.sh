@@ -71,4 +71,7 @@ echo "Running unzip_genomes.sh"
 # Unzip the files
 sbatch --wait ../download_scipts/unzip_genomes.sh
 
+echo "Adding accessions to the fasta files"
+sbatch --wait ../download_scripts/add_accessions.sh .
+
 echo "Finished downloading and modifying the desired genomes"
