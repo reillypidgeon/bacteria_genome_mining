@@ -93,9 +93,9 @@ EOF
 
 current_dir=$(basename $PWD)
 
-if [ current_dir == "download_scripts" ]; then
+if [ $current_dir == "download_scripts" ]; then
     echo "Currently in ${current_dir}"
-elif [ current_dir == "bacteria_genome_mining" ]; then
+elif [ $current_dir == "bacteria_genome_mining" ]; then
     echo "Currently in ${current_dir}"
     cd download_scripts
     echo "Changed directory to $PWD"
