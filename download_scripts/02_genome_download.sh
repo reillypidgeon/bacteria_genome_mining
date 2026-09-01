@@ -20,10 +20,9 @@ accessions="$1"
 echo "Looking into $accessions"
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
-current_dir=$(pwd)
-script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
-project_dir=$(dirname ${script_dir})
-metadata_dir=${script_dir}/metadata
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(dirname "${script_dir}")"
+metadata_dir="${script_dir}/metadata"
 
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
 touch "${metadata_dir}/urls.txt"
