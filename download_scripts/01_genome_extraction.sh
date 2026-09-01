@@ -5,46 +5,29 @@ set -euo pipefail
 echo "Running $0"
 echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input"
 
-if [ "$#" -lt 2 ]; then
+if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments"
     echo "Required: A taxon according to GTDB taxonomy"
-    echo "Usage: $0 -t <taxon_string>"
-    echo "Example: $0 -t 'g__Enterocloster'"
+    echo "Usage: $0 <taxon_string>"
+    echo "Example: $0 'g__Enterocloster'"
     exit 1
 fi
 
 # Initialize variables
-taxon=""
+taxon=$1
 
-# Define flags
-while getopts ":t" opt; do
-  case ${opt} in
-    t )
-      taxon="$OPTARG"
-      if [[ $taxon =~ ^[kpcofgs]__[A-Z] ]]; then 
-          echo "The taxon is valid: ${taxon}"
-      else
-          echo "The taxon name is not valid"
-          echo "Please provide a taxon starting with either of the following:"
-          echo "k__ p__ c__ o__ f__ g__ s__"
-          echo "Followed by the Uppercase taxon name"
-          echo "See https://gtdb.ecogenomic.org/tree?r=d__Bacteria "
-          echo "Example: -t g__Enterocloster"
-          exit 1
-      fi
-      ;;
-    \? )
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
-    : )
-      echo "Invalid option: -$OPTARG requires an argument" >&2
-      exit 1
-      ;;
-  esac
-done
-
-shift $((OPTIND -1))
+if [[ $taxon =~ ^[kpcofgs]__[A-Z] ]]; then 
+    echo "The taxon is valid: ${taxon}"
+else
+    echo "The taxon name is not valid"
+    echo "Please provide a taxon starting with either of the following:"
+    echo "k__ p__ c__ o__ f__ g__ s__"
+    echo "Followed by the Uppercase taxon name"
+    echo "See https://gtdb.ecogenomic.org/tree?r=d__Bacteria"
+    echo "Example: 'g__Enterocloster'"
+    echo "Example: 's__Enterocloster bolteae'"
+    exit 1
+fi
 
 echo "Taxon of interest to download: $taxon"
 
@@ -52,19 +35,19 @@ module load python/3.14.2 scipy-stack/2026a
 
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
-file_path=$1
-export file_path
+table_dir=$1
+export table_dir
 
 python3 << 'EOF'
 import pandas as pd
 import glob
 import os
 
-file_path = os.environ.get('file_path')
+table_dir = os.environ.get('table_dir')
 
 # Read the tables
 dfs = []
-for df in glob.glob(f"{file_path}/bac120_metadata_r232_acc_*.tsv"):
+for df in glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv"):
     df = pd.read_csv(df, sep='\t')
     df
     dfs.append(df)
@@ -73,7 +56,7 @@ df_acc = pd.concat(dfs, ignore_index=True)
 df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
 
 # Write the output to a TSV file
-df_acc.to_csv(f"{file_path}/bac120_metadata_r232_acc.tsv", sep='\t')
+df_acc.to_csv(f"{table_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
 
 EOF
 }
@@ -85,7 +68,7 @@ project_dir=$(dirname ${script_dir})
 metadata_dir="${script_dir}/metadata"
 
 # Check if the filtered metadata file already exists or prepare it
-if [ -f "${script_dir}/metadata/bac120_metadata_r232_acc.tsv" ]; then
+if [ -f "${metadata_dir}/bac120_metadata_r232_acc.tsv" ]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
 else
     # Merge the chunked tables (1-6)
