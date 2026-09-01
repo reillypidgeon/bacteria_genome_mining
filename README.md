@@ -28,6 +28,11 @@ bash genome_download.sh "genomes_g__Enterocloster_r232.tsv"
 # To do both in one line, add the -d flag to genome_extraction.sh, which will automatically call the genome_download.sh script
 bash genome_extraction.sh -t "g__Enterocloster" -d
 ```
+> [!NOTE]
+> - The genome unzipping step in the ```genome_download.sh``` script is run via the SLURM scheduler with default values for time and memory
+> - In cases where there are a large number of genomes, the allotted time and memory may become insufficient
+> - These would need to be changed in the ```genome_download.sh``` and possibly in the  ```add_accessions.sh scripts```
+
 ### Analysis
 Since not all accessions and assemblies will have available protein fasta files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
 ```
@@ -37,3 +42,7 @@ sbatch pyrodigal_annotations.sh ../genomes/*.fna
 # To search a fasta file of queries against proteins predicted from genomes
 sbatch mmseqs2_search.sh ../queries.faa ../pyrodigal_out/*.faa
 ```
+> [!NOTE]
+> - The analysis scripts run scheduled jobs via the SLURM scheduler with default values for time and memory
+> - In cases where there are a large number of genomes, the allotted time and memory may become insufficient
+> - These would need to be changed in the ```pyrodigal_annotations.sh``` and ```mmseqs2_search.sh scripts```
