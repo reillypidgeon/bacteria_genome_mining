@@ -11,8 +11,7 @@ echo "Important: This script requires internet access to fetch the genomes"
 if [ "$#" -ne 1 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A tab-separated file containing a column with NCBI accession and a column with the NCBI assembly."
-    echo "Example line: GB_GCA_048366555.1  ASM4836655v1"
-    echo "Usage: $0 <accessions_filename>"
+    echo "Usage: $0 <accessions_filename.tsv>"
     exit 1
 fi
 
@@ -24,9 +23,10 @@ echo "Looking into $accessions"
 current_dir=$(pwd)
 script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
 project_dir=$(dirname ${script_dir})
+metadata_dir=${script_dir}/metadata
 
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
-touch "${script_dir}/urls.txt"
+touch "${metadata_dir}/urls.txt"
 
 # Go line-by-line and build up URLs for each genome of interest
 while IFS= read -r line
@@ -41,7 +41,7 @@ do
   assembly=$(echo $line | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
-  echo "$full_url" >> "${script_dir}/urls.txt"
+  echo "$full_url" >> "${metadata_dir}/urls.txt"
 done < "$accessions"
 
 # Create a new directory for the genomes that will be downloaded
@@ -62,24 +62,7 @@ then
 fi
 
 if [ -f wget.log ]; then
-    mv wget.log "${scripts_dir}"
+    mv wget.log "${metadata_dir}"
 fi
 
 echo "Finished downloading genomes"
-
-echo "Running unzip_genomes.sh"
-# Unzip the files
-bash ${scripts_dir}/unzip_genomes.sh ${genomes_dir}
-
-# Add the genome accessions to each fasta file
-if [ -f "${scripts_dir}/add_accessions.sh" ]; then
-    echo "add_accessions.sh script found"
-    bash ${scripts_dir}/add_accessions.sh ${genomes_dir}
-    echo "Finished adding genome accessions to fasta files"
-else
-    echo "${scripts_dir}/add_accessions.sh script not found"
-    echo "Exiting script without any fasta modifications"
-    exit 1
-fi
-
-echo "Finished downloading and modifying the desired genomes"
