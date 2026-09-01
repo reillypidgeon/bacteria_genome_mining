@@ -92,22 +92,12 @@ df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
 EOF
 }
 
-current_dir=$(basename $PWD)
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+current_dir=$(pwd)
+script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
+project_dir=$(dirname ${script_dir})
 
-if [ $current_dir == "download_scripts" ]; then
-    echo "Currently in ${current_dir}"
-elif [ $current_dir == "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd download_scripts
-    echo "Changed directory to $PWD"
-elif [ -d "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd bacteria_genome_mining/download_scripts
-    echo "Changed directory to $PWD"
-else
-    echo "Could not resolve the path to bacteria_genome_mining"
-    exit 1
-fi
+cd ${script_dir}
 
 # Check if the filtered metadata file already exists or prepare it
 if [ -f "bac120_metadata_r232_acc.tsv" ]; then
