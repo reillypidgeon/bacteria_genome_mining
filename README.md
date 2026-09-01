@@ -17,7 +17,8 @@ Useful for looking at taxonomic distribution of genes (or proteins) and strain-l
 - Output tab-separated tables of all hits and best-hits for a given protein within a genome
 
 ## Usage
-The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
+### Genome Download
+The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
 ```
 # To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
 bash genome_extraction.sh -t "g__Enterocloster"
@@ -27,4 +28,12 @@ bash genome_download.sh "genomes_g__Enterocloster_r232.tsv"
 # To do both in one line, add the -d flag to genome_extraction.sh, which will automatically call the genome_download.sh script
 bash genome_extraction.sh -t "g__Enterocloster" -d
 ```
-<br>
+### Analysis
+Since not all accessions and assemblies will have available protein fasta files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
+```
+# To annotate genomes and predict protein-coding sequences
+sbatch pyrodigal_annotations.sh ../genomes/*.fna
+
+# To search a fasta file of queries against proteins predicted from genomes
+sbatch mmseqs2_search.sh ../queries.faa ../pyrodigal_out/*.faa
+```
