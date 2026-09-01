@@ -5,7 +5,7 @@ To find homologous sequences (or lack thereof) in genomes for a given taxonomic 
 <br>
 Useful for looking at taxonomic distribution of genes (or proteins) and strain-level variation within species.
 
-> [!WARNING]
+> [!IMPORTANT]
 > - The code in this repository is meant to run on a SLURM scheduler (Digital Research Alliance of Canada) <br>
 > - Some scripts will require internet access to work, so cannot be run in an interactive or scheduled job <br>
 > - This repository is a work in progress - there may be bugs!
@@ -17,14 +17,14 @@ Useful for looking at taxonomic distribution of genes (or proteins) and strain-l
 - Output tab-separated tables of all hits and best-hits for a given protein within a genome
 
 ## Usage
-The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table
+The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
 ```
-# To create the URL list for genomes belonging to a user-defined taxonomic level
-bash gtdb_r232_genome_extraction.sh -t g__Enterocloster
+# To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
+bash genome_extraction.sh -t g__Enterocloster
+# To download the genomes from the created table
+bash genome_download.sh 
 
-# To download all the genomes
-bash gtdb_r232_genome_extraction.sh -t g__Enterocloster -d
+# To do both in one line, add the -d flag to genome_extraction.sh
+bash genome_extraction.sh -t g__Enterocloster -d
 ```
-
-The goal is to have a single command that can download all genomes based on a string match to a GTDB phylogenetic level (e.g., "g__Enterocloster").
-The tool would then search different queries (either protein or nucleotide FASTA files) against the downloaded genomes. I may integrate Prodigal at some point to make protein-protein searches possible.
+<br>
