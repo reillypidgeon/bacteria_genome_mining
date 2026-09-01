@@ -20,6 +20,23 @@ fi
 accessions="$1"
 echo "Looking into $accessions"
 
+current_dir=$(basename $PWD)
+
+if [ $current_dir == "download_scripts" ]; then
+    echo "Currently in ${current_dir}"
+elif [ $current_dir == "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd download_scripts
+    echo "Changed directory to $PWD"
+elif [ -d "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd bacteria_genome_mining/download_scripts
+    echo "Changed directory to $PWD"
+else
+    echo "Could not resolve the path to bacteria_genome_mining"
+    exit 1
+fi
+
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
 touch urls.txt
 
@@ -44,6 +61,7 @@ mkdir -p ../genomes
 cd ../genomes
 
 # Download the genomes into the newly-created directory
+# Requires internet access!
 echo "Attempting to download the genomes"
 cat ../download_scripts/urls.txt | parallel -j 8 wget -nc
 
