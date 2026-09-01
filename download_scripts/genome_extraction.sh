@@ -66,7 +66,7 @@ import pandas as pd
 import glob
 import os
 
-file_path = os.getenv('file_path')
+file_path = os.environ.get('file_path')
 
 # Read the tables
 dfs = []
@@ -88,25 +88,29 @@ EOF
 current_dir=$(pwd)
 script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
 project_dir=$(dirname ${script_dir})
+metadata_dir="${script_dir}/metadata"
 
 # Check if the filtered metadata file already exists or prepare it
 if [ -f "${script_dir}/metadata/bac120_metadata_r232_acc.tsv" ]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
 else
     # Merge the chunked tables (1-6)
-    merge_chunked_tables "${script_dir}/metadata"
+    merge_chunked_tables "${metadata_dir}"
 fi
 
 # Now extract the accessions and assemblies that match a partial string (user input)
 export taxon
+export metadata_dir
 
 python3 << 'EOF'
 import pandas as pd
 import os
 
 taxon_string = os.environ.get('taxon')
+metadata_dir = os.environ.get('metadata_dir')
+
 print(f"Searching the metadata table for: {taxon_string}")
-df = pd.read_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+df = pd.read_csv(f"{metadata_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
 df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False)]
 
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
@@ -114,17 +118,9 @@ df_genomes = df_taxon[['accession', 'ncbi_assembly_name']]
 # Replace spaces with underscores to avoid errors in later steps
 df_genomes['ncbi_assembly_name'] = df_genomes['ncbi_assembly_name'].str.replace(' ', '_')
 file_name = f"genomes_{taxon_string}_r232.tsv".replace(" ", "_")
-df_genomes.to_csv(file_name, sep='\t', header=False, index=False)
+df_genomes.to_csv(f"{metadata_dir}/{file_name}", sep='\t', header=False, index=False)
 
 EOF
 
-# Check if the download flag is true and call the download script
-if [[ $download_boolean == true ]]; then
-    echo "Genomes will be downloaded using the genome_download.sh script"
-    # In case a species was given, this would replace the space with an underscore
-    taxon=$(echo $taxon | tr ' ' '_')
-    echo " Downloading genomes for $taxon based on genomes_${taxon}_r232.tsv"
-    bash genome_download.sh "genomes_${taxon}_r232.tsv"
-else
-    echo "The genomes file containing accessions and assemblies can now be separately passed to the genome_download.sh script"
-fi
+echo "Finished extracting genomes"
+echo "Can now download using the genome_download.sh script"
