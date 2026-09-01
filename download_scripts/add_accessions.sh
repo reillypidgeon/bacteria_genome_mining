@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=add_accessions
-#SBATCH --output=%x_%j.out
-#SBATCH --time=00:15:00
-#SBATCH --mem=16G
-
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
