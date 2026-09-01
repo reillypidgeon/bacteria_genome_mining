@@ -91,6 +91,23 @@ df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
 EOF
 }
 
+current_dir=$(basename $PWD)
+
+if [ current_dir == "download_scripts" ]; then
+    echo "Currently in ${current_dir}"
+elif [ current_dir == "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd download_scripts
+    echo "Changed directory to $PWD"
+elif [ -d "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd bacteria_genome_mining/download_scripts
+    echo "Changed directory to $PWD"
+else
+    echo "Could not resolve the path to bacteria_genome_mining"
+    exit 1
+fi
+
 # Check if the filtered metadata file already exists or prepare it
 if [ -f "bac120_metadata_r232_acc.tsv" ]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
