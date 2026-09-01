@@ -70,12 +70,9 @@ print("Extracted columns of interest from metadata table")
 EOF
 }
 
-# Check if the filtered metadata file already exists or prepare it
-if [ -f "bac120_metadata_r232_acc.tsv" ]; then
-    echo "Filtered metadata already exists. No need for downloads or further processing."
-elif [ -f "bac120_metadata_r232_acc_1.tsv" ] && [ -f "bac120_metadata_r232_acc_6.tsv" ]; then
-    echo "Found chunked filtered metadata tables. Concatenating the tables together."
-    python3 << 'EOF'
+# Define a function that will merge chunked accession tables
+merge_chunked_tables() {
+python3 << 'EOF'
 import pandas as pd
 import glob
 
@@ -87,11 +84,20 @@ for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
 
 df_acc = pd.concat(dfs, ignore_index=True)
 df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
+
 # Write the output to a TSV file
 df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
 
 EOF
+}
 
+# Check if the filtered metadata file already exists or prepare it
+if [ -f "bac120_metadata_r232_acc.tsv" ]; then
+    echo "Filtered metadata already exists. No need for downloads or further processing."
+elif [ -f "bac120_metadata_r232_acc_1.tsv" ] && [ -f "bac120_metadata_r232_acc_6.tsv" ]; then
+    echo "Found chunked filtered metadata tables. Concatenating the tables together."
+    # Merge the chunked tables (1-6)
+    merge_chunked_tables
 elif [ -f "bac120_metadata_r232.tsv" ]; then
     echo "Filtering the unzipped metadata table to extract the accession and ncbi_assembly_name columns"
     # Produce the filtered metadata file
