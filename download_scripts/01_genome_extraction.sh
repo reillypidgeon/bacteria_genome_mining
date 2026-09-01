@@ -5,21 +5,19 @@ set -euo pipefail
 echo "Running $0"
 echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input"
 
-if [ "$#" -lt 1 ]; then
+if [ "$#" -lt 2 ]; then
     echo "Error: Invalid number of arguments"
-    echo "Required: A taxon according to GTDB taxonomy and an optional flag (-d) to download"
-    echo "Usage: $0 -t <taxon_string> [-d]"
+    echo "Required: A taxon according to GTDB taxonomy"
+    echo "Usage: $0 -t <taxon_string>"
     echo "Example: $0 -t 'g__Enterocloster'"
-    echo "Example: $0 -t 's__Enterocloster asparagiformis' -d"
     exit 1
 fi
 
 # Initialize variables
 taxon=""
-download_boolean=false
 
 # Define flags
-while getopts ":t:d" opt; do
+while getopts ":t" opt; do
   case ${opt} in
     t )
       taxon="$OPTARG"
@@ -35,9 +33,6 @@ while getopts ":t:d" opt; do
           exit 1
       fi
       ;;
-    d )
-      download_boolean=true
-      ;;
     \? )
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -52,7 +47,6 @@ done
 shift $((OPTIND -1))
 
 echo "Taxon of interest to download: $taxon"
-echo "Download after producing the accessions table: $download_boolean"
 
 module load python/3.14.2 scipy-stack/2026a
 
