@@ -76,20 +76,20 @@ if [ -f "bac120_metadata_r232_acc.tsv" ]; then
 elif [ -f "bac120_metadata_r232_acc_1.tsv" ] && [ -f "bac120_metadata_r232_acc_6.tsv" ]; then
     echo "Found chunked filtered metadata tables. Concatenating the tables together."
     python3 << 'EOF'
-    import pandas as pd
-    import glob
-    
-    # Read the tables
-    dfs = []
-    for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
-        df = pd.read_csv(df, sep='\t')
-        dfs.append(df)
-    
-    df_acc = pd.concat(dfs, ignore_index=True)
-    df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
-    # Write the output to a TSV file
-    df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
-    
+import pandas as pd
+import glob
+
+# Read the tables
+dfs = []
+for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
+    df = pd.read_csv(df, sep='\t')
+    dfs.append(df)
+
+df_acc = pd.concat(dfs, ignore_index=True)
+df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
+# Write the output to a TSV file
+df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+
 EOF
 
 elif [ -f "bac120_metadata_r232.tsv" ]; then
