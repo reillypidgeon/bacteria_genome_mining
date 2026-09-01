@@ -65,6 +65,8 @@ cd ../genomes
 echo "Attempting to download the genomes"
 cat ../download_scripts/urls.txt | parallel -j 8 wget -nc
 
+echo "Finished downloading genomes"
+
 # Unzip the files
 sbatch --wait << 'EOF'
 #!/usr/bin/env bash
