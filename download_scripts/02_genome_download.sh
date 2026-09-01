@@ -55,10 +55,10 @@ echo "Attempting to download the genomes"
 
 if ! parallel -j 8 \
     --joblog wget.log \
-    wget -nc :::: "${scripts_dir}/urls.txt"
+    wget -nc :::: "${metadata_dir}/urls.txt"
 then
     echo "Warning: One or more downloads failed."
-    echo "See ../download_scripts/wget.log for details."
+    echo "See ${metadata_dir}/wget.log for details."
 fi
 
 if [ -f wget.log ]; then
