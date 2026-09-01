@@ -20,8 +20,13 @@ fi
 accessions="$1"
 echo "Looking into $accessions"
 
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+current_dir=$(pwd)
+script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
+project_dir=$(dirname ${script_dir})
+
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
-touch urls.txt
+touch "${script_dir}/urls.txt"
 
 # Go line-by-line and build up URLs for each genome of interest
 while IFS= read -r line
@@ -36,13 +41,8 @@ do
   assembly=$(echo $line | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
-  echo "$full_url" >> urls.txt
+  echo "$full_url" >> "${script_dir}/urls.txt"
 done < "$accessions"
-
-# Get the path to the script directory and the project directory (bacteria_genome_mining)
-current_dir=$(pwd)
-script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
-project_dir=$(dirname ${script_dir})
 
 # Create a new directory for the genomes that will be downloaded
 genomes_dir="${project_dir}/genomes"
@@ -70,10 +70,6 @@ echo "Finished downloading genomes"
 echo "Running unzip_genomes.sh"
 # Unzip the files
 bash ${scripts_dir}/unzip_genomes.sh
-
-cat unzip_genomes_*
-# Remove the output file from the previous job to avoid errors when going through the genomes in later steps
-rm unzip_genomes_*
 
 # Add the genome accessions to each fasta file
 if [ -f "${scripts_dir}/add_accessions.sh" ]; then
