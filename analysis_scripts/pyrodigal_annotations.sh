@@ -36,22 +36,20 @@ current_dir=$(basename $PWD)
 
 if [ $current_dir == "analysis_scripts" ]; then
     echo "Currently in ${current_dir}"
+	out_dir="../pyrodigal_out"
+	mkdir -p "${out_dir}"
 elif [ $current_dir == "bacteria_genome_mining" ]; then
     echo "Currently in ${current_dir}"
-    cd analysis_scripts
-    echo "Changed directory to $PWD"
+    out_dir="pyrodigal_out"
+	mkdir -p "${out_dir}"
 elif [ -d "bacteria_genome_mining" ]; then
     echo "Currently in ${current_dir}"
-    cd bacteria_genome_mining/analysis_scripts
-    echo "Changed directory to $PWD"
+    out_dir="bacteria_genome_mining/pyrodigal_out"
+	mkdir -p "${out_dir}"
 else
     echo "Could not resolve the path to bacteria_genome_mining"
     exit 1
 fi
-
-# Extract the path to the fasta file(s) and create an output directory
-out_dir="../pyrodigal_out"
-mkdir -p "${out_dir}"
 
 # Loop through the file(s)
 for fasta_file in "$@"; do
@@ -83,3 +81,4 @@ for fasta_file in "$@"; do
 done
 
 date
+echo "Finished pyrodigal annotations on genomes"
