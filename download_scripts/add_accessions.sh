@@ -11,8 +11,8 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Define the accessions variable based on the user input file
-fasta_dir=$(basename "$1")
-cd "$fasta_dir"
+genomes_dir=$(basename "$1")
+cd "$genomes_dir"
 
 # Loop through fasta files, which all end with .fna
 # Add the accession after the > and write a new file for each genome
