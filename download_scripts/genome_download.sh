@@ -69,7 +69,7 @@ echo "Finished downloading genomes"
 
 echo "Running unzip_genomes.sh"
 # Unzip the files
-bash ${scripts_dir}/unzip_genomes.sh
+bash ${scripts_dir}/unzip_genomes.sh ${genomes_dir}
 
 # Add the genome accessions to each fasta file
 if [ -f "${scripts_dir}/add_accessions.sh" ]; then
