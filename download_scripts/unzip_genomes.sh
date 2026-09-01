@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 echo "Running $0"
 echo "This script unzips fasta files downloaded from the NCBI."
 
@@ -10,9 +12,8 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-# Define the accessions variable based on the user input file
-genomes_dir=$(basename "$1")
-cd "$genomes_dir"
+# Go to the user-defined directory
+cd "$1"
 
 echo "Unzipping files"
 gunzip *.fna.gz
