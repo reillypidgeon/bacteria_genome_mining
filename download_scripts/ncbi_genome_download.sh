@@ -71,7 +71,9 @@ echo "Running unzip_genomes.sh"
 # Unzip the files
 sbatch --wait ../download_scipts/unzip_genomes.sh
 
-
+cat unzip_genomes_*
+# Remove the output file from the previous job to avoid errors when going through the genomes in later steps
+rm unzip_genomes_*
 
 # Add the genome accessions to each fasta file
 if [ -f "../download_scripts/add_accessions.sh" ]; then
