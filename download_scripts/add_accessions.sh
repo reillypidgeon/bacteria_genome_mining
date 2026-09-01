@@ -12,7 +12,7 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-# Define the accessions variable based on the user input file
+# Go to the user-defined directory
 cd "$1"
 
 # Loop through fasta files, which all end with .fna
