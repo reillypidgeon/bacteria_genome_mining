@@ -82,7 +82,7 @@ echo "Finished downloading genomes"
 
 echo "Running unzip_genomes.sh"
 # Unzip the files
-sbatch --wait ../download_scipts/unzip_genomes.sh
+sbatch --wait ../download_scripts/unzip_genomes.sh
 
 cat unzip_genomes_*
 # Remove the output file from the previous job to avoid errors when going through the genomes in later steps
