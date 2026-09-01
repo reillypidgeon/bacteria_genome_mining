@@ -156,11 +156,11 @@ EOF
 
 # Check if the download flag is true and call the download script
 if [[ $download_boolean == true ]]; then
-    echo "Genomes will be downloaded using the ncbi_genome_download.sh script"
+    echo "Genomes will be downloaded using the genome_download.sh script"
     # In case a species was given, this would replace the space with an underscore
     taxon=$(echo $taxon | tr ' ' '_')
     echo " Downloading genomes for $taxon based on genomes_${taxon}_r232.tsv"
-    bash ncbi_genome_download.sh "genomes_${taxon}_r232.tsv"
+    bash genome_download.sh "genomes_${taxon}_r232.tsv"
 else
-    echo "The genomes file containing accessions and assemblies can now be separately passed to the ncbi_genome_download.sh script"
+    echo "The genomes file containing accessions and assemblies can now be separately passed to the genome_download.sh script"
 fi
