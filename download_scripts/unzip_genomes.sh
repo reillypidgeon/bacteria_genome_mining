@@ -10,7 +10,3 @@ date
 gunzip *.fna.gz
 sleep 5
 echo "Unzipping finished"
-
-cat unzip_genomes*
-# Remove the output file from the previous job to avoid errors when going through the genomes in later steps
-rm unzip_genomes*
