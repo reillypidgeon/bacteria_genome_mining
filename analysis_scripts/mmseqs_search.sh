@@ -27,9 +27,24 @@ module load StdEnv/2023 mmseqs2/17-b804f cudacore/.12.6.3
 # Assign command line argument for the query
 query_fasta="$1"
 
-# Create an output directory
-out_dir="../mmseqs2_out"
-mkdir -p "${out_dir}"
+current_dir=$(basename $PWD)
+
+if [ $current_dir == "analysis_scripts" ]; then
+    echo "Currently in ${current_dir}"
+	out_dir="../mmseqs2_out"
+	mkdir -p "${out_dir}"
+elif [ $current_dir == "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    out_dir="mmseqs2_out"
+	mkdir -p "${out_dir}"
+elif [ -d "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    out_dir="bacteria_genome_mining/mmseqs2_out"
+	mkdir -p "${out_dir}"
+else
+    echo "Could not resolve the path to bacteria_genome_mining"
+    exit 1
+fi
 
 # Assign the output format
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
