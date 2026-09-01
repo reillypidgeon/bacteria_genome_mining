@@ -72,22 +72,41 @@ EOF
 
 # Check if the filtered metadata file already exists or prepare it
 if [ -f "bac120_metadata_r232_acc.tsv" ]; then
-  echo "Filtered metadata already exists. No need for downloads or further processing."
+    echo "Filtered metadata already exists. No need for downloads or further processing."
+elif [ -f "bac120_metadata_r232_acc_1.tsv" ] && [ -f "bac120_metadata_r232_acc_6.tsv" ]; then
+    echo "Found chunked filtered metadata tables. Concatenating the tables together."
+    python3 << 'EOF'
+    import pandas as pd
+    import glob
+    
+    # Read the tables
+    dfs = []
+    for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
+        df = pd.read_csv(df, sep='\t')
+        dfs.append(df)
+    
+    df_acc = pd.concat(dfs, ignore_index=True)
+    df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
+    # Write the output to a TSV file
+    df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+    
+EOF
+
 elif [ -f "bac120_metadata_r232.tsv" ]; then
-  echo "Filtering the unzipped metadata table to extract the accession and ncbi_assembly_name columns"
-  # Produce the filtered metadata file
-  gtdb_accessions_assemblies
+    echo "Filtering the unzipped metadata table to extract the accession and ncbi_assembly_name columns"
+    # Produce the filtered metadata file
+    gtdb_accessions_assemblies
 elif [ -f "bac120_metadata_r232.tsv.gz" ]; then
-  echo "Zipped file exists. Unzipping and filtering columns"
-  gunzip bac120_metadata_r232.tsv.gz
-  # Produce the filtered metadata file
-  gtdb_accessions_assemblies
+    echo "Zipped file exists. Unzipping and filtering columns"
+    gunzip bac120_metadata_r232.tsv.gz
+    # Produce the filtered metadata file
+    gtdb_accessions_assemblies
 else
-  echo "Downloading the metadata, unzipping, and filtering data"
-  wget https://data.gtdb.ecogenomic.org/releases/release232/232.0/bac120_metadata_r232.tsv.gz
-  gunzip bac120_metadata_r232.tsv.gz
-  # Produce the filtered metadata file
-  gtdb_accessions_assemblies  
+    echo "Downloading the metadata, unzipping, and filtering data"
+    wget https://data.gtdb.ecogenomic.org/releases/release232/232.0/bac120_metadata_r232.tsv.gz
+    gunzip bac120_metadata_r232.tsv.gz
+    # Produce the filtered metadata file
+    gtdb_accessions_assemblies  
 fi
 
 # Now extract the accessions and assemblies that match a partial string (user input)
