@@ -25,31 +25,34 @@ if [ "$#" -lt 1 ]; then
 	exit 1
 fi
 
-# Create a virtual environment to load pyrodigal for parallel predictions
-virtualenv --no-download $SLURM_TMPDIR/env
-source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index --upgrade pip
-
-pip install --no-index -r pyrodigal_requirements.txt
-
 current_dir=$(basename $PWD)
 
 if [ $current_dir == "analysis_scripts" ]; then
     echo "Currently in ${current_dir}"
 	out_dir="../pyrodigal_out"
 	mkdir -p "${out_dir}"
+	requirements="pyrodigal_requirements.txt"
 elif [ $current_dir == "bacteria_genome_mining" ]; then
     echo "Currently in ${current_dir}"
     out_dir="pyrodigal_out"
 	mkdir -p "${out_dir}"
+	requirements="analysis_scripts/pyrodigal_requirements.txt"
 elif [ -d "bacteria_genome_mining" ]; then
     echo "Currently in ${current_dir}"
     out_dir="bacteria_genome_mining/pyrodigal_out"
 	mkdir -p "${out_dir}"
+	requirements="bacteria_genome_mining/analysis_scripts/pyrodigal_requirements.txt"
 else
     echo "Could not resolve the path to bacteria_genome_mining"
     exit 1
 fi
+
+# Create a virtual environment to load pyrodigal for parallel predictions
+virtualenv --no-download $SLURM_TMPDIR/env
+source $SLURM_TMPDIR/env/bin/activate
+pip install --no-index --upgrade pip
+
+pip install --no-index -r $requirements
 
 # Loop through the file(s)
 for fasta_file in "$@"; do
