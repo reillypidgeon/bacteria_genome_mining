@@ -18,6 +18,9 @@ cd "$1"
 # Loop through fasta files, which all end with .fna
 # Add the accession after the > and write a new file for each genome
 for file in *.fna; do
+    # Skip files that have already been processed
+    [[ "$file" == *_acc.fna ]] && continue
+    
     name="${file%.fna}"
     accession=$(echo $name | grep -Eo "^GC[A,F]_[[:digit:]]{9}\.[1-9]")
     sed "s/^>/>${accession}-/" "$file" > "${name}_acc.fna"
