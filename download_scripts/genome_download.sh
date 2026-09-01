@@ -39,28 +39,15 @@ do
   echo "$full_url" >> urls.txt
 done < "$accessions"
 
-current_dir=$(basename $PWD)
-
-if [ "$current_dir" == "download_scripts" ]; then
-    echo "Currently in ${current_dir}"
-elif [ "$current_dir" == "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd download_scripts
-    mv ../urls.txt .
-    echo "Changed directory to $PWD"
-elif [ -d "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd bacteria_genome_mining/download_scripts
-    mv ../../urls.txt .
-    echo "Changed directory to $PWD"
-else
-    echo "Could not resolve the path to bacteria_genome_mining"
-    exit 1
-fi
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+current_dir=$(pwd)
+script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
+project_dir=$(dirname ${script_dir})
 
 # Create a new directory for the genomes that will be downloaded
-mkdir -p ../genomes
-cd ../genomes
+genomes_dir="${project_dir}/genomes"
+mkdir -p "${genomes_dir}"
+cd "${genomes_dir}"
 
 # Download the genomes into the newly-created directory
 # Requires internet access!
@@ -68,33 +55,33 @@ echo "Attempting to download the genomes"
 
 if ! parallel -j 8 \
     --joblog wget.log \
-    wget -nc :::: ../download_scripts/urls.txt
+    wget -nc :::: "${scripts_dir}/urls.txt"
 then
     echo "Warning: One or more downloads failed."
     echo "See ../download_scripts/wget.log for details."
 fi
 
 if [ -f wget.log ]; then
-    mv wget.log ../download_scripts
+    mv wget.log "${scripts_dir}"
 fi
 
 echo "Finished downloading genomes"
 
 echo "Running unzip_genomes.sh"
 # Unzip the files
-sbatch --wait ../download_scripts/unzip_genomes.sh
+bash ${scripts_dir}/unzip_genomes.sh
 
 cat unzip_genomes_*
 # Remove the output file from the previous job to avoid errors when going through the genomes in later steps
 rm unzip_genomes_*
 
 # Add the genome accessions to each fasta file
-if [ -f "../download_scripts/add_accessions.sh" ]; then
+if [ -f "${scripts_dir}/add_accessions.sh" ]; then
     echo "add_accessions.sh script found"
-    sbatch --wait ../download_scripts/add_accessions.sh .
+    bash ${scripts_dir}/add_accessions.sh ${genomes_dir}
     echo "Finished adding genome accessions to fasta files"
 else
-    echo "add_accessions.sh script not found"
+    echo "${scripts_dir}/add_accessions.sh script not found"
     echo "Exiting script without any fasta modifications"
     exit 1
 fi
