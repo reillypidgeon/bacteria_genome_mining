@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#SBATCH
+#SBATCH
+#SBATCH
+
 echo "Running $0"
 echo "This script adds genome accessions to the fasta header for use in downstream analyses that require this information."
 
