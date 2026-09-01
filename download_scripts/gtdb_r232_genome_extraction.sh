@@ -80,6 +80,7 @@ import glob
 dfs = []
 for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
     df = pd.read_csv(df, sep='\t')
+    df
     dfs.append(df)
 
 df_acc = pd.concat(dfs, ignore_index=True)
