@@ -32,6 +32,23 @@ pip install --no-index --upgrade pip
 
 pip install --no-index -r pyrodigal_requirements.txt
 
+current_dir=$(basename $PWD)
+
+if [ $current_dir == "analysis_scripts" ]; then
+    echo "Currently in ${current_dir}"
+elif [ $current_dir == "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd analysis_scripts
+    echo "Changed directory to $PWD"
+elif [ -d "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd bacteria_genome_mining/analysis_scripts
+    echo "Changed directory to $PWD"
+else
+    echo "Could not resolve the path to bacteria_genome_mining"
+    exit 1
+fi
+
 # Extract the path to the fasta file(s) and create an output directory
 out_dir="../pyrodigal_out"
 mkdir -p "${out_dir}"
