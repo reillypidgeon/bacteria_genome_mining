@@ -56,29 +56,21 @@ echo "Download after producing the accessions table: $download_boolean"
 
 module load python/3.14.2 scipy-stack/2026a
 
-# Define a function that will extract the accession, ncbi_assembly_name, and gtdb_taxonomy columns from the GTDB metadata table
-# This table can be reused for other analyses, so it's a good idea to save it
-gtdb_accessions_assemblies() {
-python3 << 'EOF'
-import pandas as pd
-# Read the table and keep the desired columns
-df = pd.read_csv("bac120_metadata_r232.tsv", sep='\t')
-df_acc = df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'ncbi_isolate']]
-# Write the output to a TSV file
-df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
-print("Extracted columns of interest from metadata table")
-EOF
-}
-
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
+file_path=$1
+export file_path
+
 python3 << 'EOF'
 import pandas as pd
 import glob
+import os
+
+file_path = os.getenv('file_path')
 
 # Read the tables
 dfs = []
-for df in glob.glob("bac120_metadata_r232_acc_*.tsv"):
+for df in glob.glob(f"{file_path}/bac120_metadata_r232_acc_*.tsv"):
     df = pd.read_csv(df, sep='\t')
     df
     dfs.append(df)
@@ -87,7 +79,7 @@ df_acc = pd.concat(dfs, ignore_index=True)
 df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
 
 # Write the output to a TSV file
-df_acc.to_csv("bac120_metadata_r232_acc.tsv", sep='\t')
+df_acc.to_csv(f"{file_path}/bac120_metadata_r232_acc.tsv", sep='\t')
 
 EOF
 }
@@ -97,30 +89,12 @@ current_dir=$(pwd)
 script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
 project_dir=$(dirname ${script_dir})
 
-cd ${script_dir}
-
 # Check if the filtered metadata file already exists or prepare it
-if [ -f "bac120_metadata_r232_acc.tsv" ]; then
+if [ -f "${script_dir}/metadata/bac120_metadata_r232_acc.tsv" ]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
-elif [ -f "bac120_metadata_r232_acc_1.tsv" ] && [ -f "bac120_metadata_r232_acc_6.tsv" ]; then
-    echo "Found chunked filtered metadata tables. Concatenating the tables together."
-    # Merge the chunked tables (1-6)
-    merge_chunked_tables
-elif [ -f "bac120_metadata_r232.tsv" ]; then
-    echo "Filtering the unzipped metadata table to extract the accession and ncbi_assembly_name columns"
-    # Produce the filtered metadata file
-    gtdb_accessions_assemblies
-elif [ -f "bac120_metadata_r232.tsv.gz" ]; then
-    echo "Zipped file exists. Unzipping and filtering columns"
-    gunzip bac120_metadata_r232.tsv.gz
-    # Produce the filtered metadata file
-    gtdb_accessions_assemblies
 else
-    echo "Downloading the metadata, unzipping, and filtering data"
-    wget https://data.gtdb.ecogenomic.org/releases/release232/232.0/bac120_metadata_r232.tsv.gz
-    gunzip bac120_metadata_r232.tsv.gz
-    # Produce the filtered metadata file
-    gtdb_accessions_assemblies  
+    # Merge the chunked tables (1-6)
+    merge_chunked_tables "${script_dir}/metadata"
 fi
 
 # Now extract the accessions and assemblies that match a partial string (user input)
