@@ -20,23 +20,6 @@ fi
 accessions="$1"
 echo "Looking into $accessions"
 
-current_dir=$(basename $PWD)
-
-if [ $current_dir == "download_scripts" ]; then
-    echo "Currently in ${current_dir}"
-elif [ $current_dir == "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd download_scripts
-    echo "Changed directory to $PWD"
-elif [ -d "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    cd bacteria_genome_mining/download_scripts
-    echo "Changed directory to $PWD"
-else
-    echo "Could not resolve the path to bacteria_genome_mining"
-    exit 1
-fi
-
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
 touch urls.txt
 
@@ -53,8 +36,27 @@ do
   assembly=$(echo $line | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
-  echo $full_url >> urls.txt
-done < $accessions
+  echo "$full_url" >> urls.txt
+done < "$accessions"
+
+current_dir=$(basename $PWD)
+
+if [ "$current_dir" == "download_scripts" ]; then
+    echo "Currently in ${current_dir}"
+elif [ "$current_dir" == "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd download_scripts
+    mv ../urls.txt .
+    echo "Changed directory to $PWD"
+elif [ -d "bacteria_genome_mining" ]; then
+    echo "Currently in ${current_dir}"
+    cd bacteria_genome_mining/download_scripts
+    mv ../../urls.txt .
+    echo "Changed directory to $PWD"
+else
+    echo "Could not resolve the path to bacteria_genome_mining"
+    exit 1
+fi
 
 # Create a new directory for the genomes that will be downloaded
 mkdir -p ../genomes
@@ -63,7 +65,18 @@ cd ../genomes
 # Download the genomes into the newly-created directory
 # Requires internet access!
 echo "Attempting to download the genomes"
-cat ../download_scripts/urls.txt | parallel -j 8 wget -nc
+
+if ! parallel -j 8 \
+    --joblog wget.log \
+    wget -nc :::: ../download_scripts/urls.txt
+then
+    echo "Warning: One or more downloads failed."
+    echo "See ../download_scripts/wget.log for details."
+fi
+
+if [ -f wget.log ]; then
+    mv wget.log ../download_scripts
+fi
 
 echo "Finished downloading genomes"
 
