@@ -9,6 +9,23 @@
 
 set -euo pipefail
 
+if [ "$#" -lt 2 ]; then
+    echo "Error: Invalid number of arguments."
+    echo "Required: FASTA files of the query and subject(s)"
+    echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
+    echo "Example: $0 queries.faa proteins/*.faa"
+    exit 1
+fi
+
+# Assign command line argument for the query
+query_fasta="$1"
+
+# Check if the query file exists
+if [[ ! -f "${query_fasta}" ]]; then
+	echo "Error: Query FASTA file not found"
+	exit 1
+fi
+
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
 
@@ -39,6 +56,6 @@ echo "Python: $(which python)"
 echo "mmseqs2: $(which mmseqs2)"
 
 # Run mmseqs2
-bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" "${project_dir}/results/queries.faa" "${project_dir}/results/pyrodigal_out/*.faa"
+bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" "${query_fasta}" "${@:2}"
 
 echo "Finished predicting proteins for all given genomes"
