@@ -24,15 +24,18 @@ The following are usage examples:
 ```
 # To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
 # Optional SLURM script
+
 bash 01_genome_extraction.sh "g__Enterocloster"
 sbatch 01_genome_extraction.slurm "g__Enterocloster"
 
 # To download the genomes from the created table
 # IMPORTANT: Requires internet access
+
 bash 02_genome_download.sh "metadata/genomes_g__Enterocloster_r232.tsv"
 
 # To unzip genomes and add accessions to fasta headers
 # Optional SLURM script
+
 bash 03_genome_preparation.sh
 sbatch 03_genome_preparation.slurm
 ```
@@ -45,10 +48,12 @@ Since not all accessions and assemblies will have available protein fasta files 
 ```
 # To annotate genomes and predict protein-coding sequences
 # The *acc.fna used here represents FASTA files that have modified headers (added accessions)
+
 bash 04_pyrodigal_annotations.sh ../genomes/*acc.fna
 sbatch 04_pyrodigal_annotations.slurm ../genomes/*acc.fna
 
 # To search a user-defined fasta file of queries against proteins predicted from genomes
+
 bash 05_mmseqs2_search.sh ../results/queries.faa
 sbatch 05_mmseqs2_search.slurm ../results/queries.faa
 ```
