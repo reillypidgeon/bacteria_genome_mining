@@ -25,14 +25,11 @@ search_dir="${SLURM_SUBMIT_DIR}"
 
 # Search upward for the project root
 while [[ "${search_dir}" != "/" ]]; do
-
-    if [[ -d "${search_dir}/download_scripts" ]]; then
+    if [[ -d "${search_dir}/download_scripts" ]] && [[ -d "${search_dir}/analysis_scripts" ]]; then
         project_dir="${search_dir}"
         break
     fi
-
     search_dir="$(dirname "${search_dir}")"
-
 done
 
 # Stop if the project directory could not be found
