@@ -20,18 +20,30 @@ fi
 # Set the taxon variable
 taxon="$1"
 
-# Return to the directory from which sbatch was submitted
-cd "${SLURM_SUBMIT_DIR}"
+# Start from the directory where sbatch was submitted
+search_dir="${SLURM_SUBMIT_DIR}"
 
-# Get the absolute path to the project
-project_dir="$(pwd)"
+# Search upward for the project root
+while [[ "${search_dir}" != "/" ]]; do
 
-# Define the script directory
-script_dir="${project_dir}/download_scripts"
+    if [[ -d "${search_dir}/download_scripts" ]]; then
+        project_dir="${search_dir}"
+        break
+    fi
 
-echo "SLURM submit directory: ${SLURM_SUBMIT_DIR}"
+    search_dir="$(dirname "${search_dir}")"
+
+done
+
+# Stop if the project directory could not be found
+if [[ -z "${project_dir:-}" ]]; then
+    echo "Error: Could not locate the bacteria_genome_mining project directory."
+    echo "The job must be submitted from somewhere inside the project."
+    exit 1
+fi
+
+echo "SLURM submission directory: ${SLURM_SUBMIT_DIR}"
 echo "Project directory: ${project_dir}"
-echo "Script directory: ${script_dir}"
 
 # Load required software
 module load python scipy-stack
@@ -40,6 +52,6 @@ echo "Running genome extraction"
 echo "Taxon: $taxon"
 
 # Run the portable genome extraction script
-bash "${script_dir}/01_genome_extraction.sh" "$taxon"
+bash "${project_dir}/download_scripts/01_genome_extraction.sh" "$taxon"
 
 echo "Genome extraction complete"
