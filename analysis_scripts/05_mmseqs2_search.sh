@@ -9,9 +9,7 @@ if [ "$#" -lt 2 ]; then
     echo "Error: Invalid number of arguments."
     echo "Required: FASTA files of the query and subject(s)"
     echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
-    echo
-    echo "Example: $0 queries.fna proteins/*.fna"
-    echo "Example: $0 queries.faa genomes/*.faa"
+    echo "Example: $0 queries.faa proteins/*.faa"
     exit 1
 fi
 
