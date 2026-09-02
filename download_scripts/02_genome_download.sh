@@ -32,8 +32,8 @@ urls_file="${metadata_dir}/urls.txt"
 while IFS= read -r line
 do
   base_url="https://ftp.ncbi.nlm.nih.gov/genomes/all"
-  gb_rs=$(echo $line | grep -o "GC[A,F]")
-  accession=$(echo $line | grep -Eo "GC[A,F]_[[:digit:]]{9}\.[1-9]")
+  gb_rs=$(echo $line | grep -o "GC[AF]")
+  accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[1-9]")
   accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
   first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
   second_three=$(echo $accession_numbers | grep -oP "(?<=^[0-9]{3})[0-9]{3}(?=[0-9]{3}$)")
@@ -54,15 +54,11 @@ cd "${genomes_dir}"
 echo "Attempting to download the genomes"
 
 if ! parallel -j 8 \
-    --joblog wget.log \
-    wget -nc :::: "${metadata_dir}/urls.txt"
+    --joblog ${metadata_dir}/wget.log \
+    wget -nc :::: "${urls_file}"
 then
     echo "Warning: One or more downloads failed."
     echo "See ${metadata_dir}/wget.log for details."
-fi
-
-if [ -f wget.log ]; then
-    mv wget.log "${metadata_dir}"
 fi
 
 echo "Finished downloading genomes"
