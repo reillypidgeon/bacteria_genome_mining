@@ -18,24 +18,25 @@ fi
 # Assign command line argument for the query
 query_fasta="$1"
 
-current_dir=$(basename $PWD)
-
-if [ $current_dir == "analysis_scripts" ]; then
-    echo "Currently in ${current_dir}"
-	out_dir="../mmseqs2_out"
-	mkdir -p "${out_dir}"
-elif [ $current_dir == "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    out_dir="mmseqs2_out"
-	mkdir -p "${out_dir}"
-elif [ -d "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    out_dir="bacteria_genome_mining/mmseqs2_out"
-	mkdir -p "${out_dir}"
-else
-    echo "Could not resolve the path to bacteria_genome_mining"
-    exit 1
+# Check if the query file exists
+if [[ ! -f "${query_fasta}" ]]; then
+	echo "Error: Query FASTA file not found"
+	exit 1
 fi
+
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(dirname "${script_dir}")"
+
+# Create the output directory
+out_dir="${project_dir}/results/mmseqs2_out"
+mkdir -p "${out_dir}"
+
+# Define the temporary directory for mmseqs2
+
+
+# Define the number of threads
+
 
 # Assign the output format
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
@@ -112,7 +113,7 @@ for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
     
     # Extract the accession from the file_name and add to the dataframes
     print(f"Extracting the accession for {file_name}")
-    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]"
+    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]+"
     accession = re.search(pattern, file_name).group(0)
     accession = accession.upper()
     print(accession)
