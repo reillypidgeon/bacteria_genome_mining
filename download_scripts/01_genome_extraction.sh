@@ -14,9 +14,9 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Initialize variables
-taxon=$1
+taxon="$1"
 
-if [[ $taxon =~ ^[kpcofgs]__[A-Z] ]]; then 
+if [[ "$taxon" =~ ^[kpcofgs]__ ] ]]; then 
     echo "The taxon is valid: ${taxon}"
 else
     echo "The taxon name is not valid"
@@ -29,27 +29,48 @@ else
     exit 1
 fi
 
-echo "Taxon of interest to download: $taxon"
+# Allow the Python executable to be overridden
+python_cmd="${PYTHON:-python3}"
 
-module load python/3.14.2 scipy-stack/2026a
+# Check that Python is available
+if ! command -v "$python_cmd" >/dev/null 2>&1; then
+    echo "Error: Python executable not found: $python_cmd"
+    echo "Set the PYTHON environment variable or activate a suitable environment"
+    exit 1
+fi
+
+# Check required pandas dependency
+if ! "$python_cmd" -c "import pandas" >/dev/null 2>&1; then
+    echo "Error: Python package 'pandas' is not available"
+    echo "Please activate an environment containing pandas"
+    echo "This dependency may be part of the scipy-stack module in your cluster"
+    exit 1
+fi
+
+echo "Using Python: $("$python_cmd" --version)"
+echo "Taxon of interest to download: $taxon"
 
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
 table_dir=$1
 export table_dir
 
-python3 << 'EOF'
+"$python_cmd" << 'EOF'
 import pandas as pd
 import glob
 import os
 
 table_dir = os.environ.get('table_dir')
+files = glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv")
+
+# Check if files can be found
+if not files:
+    raise FileNotFoundError(f"No chunked metadata files found in {table_dir}")
 
 # Read the tables
 dfs = []
-for df in glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv"):
-    df = pd.read_csv(df, sep='\t')
-    df
+for file in files:
+    df = pd.read_csv(file, sep='\t')
     dfs.append(df)
 
 df_acc = pd.concat(dfs, ignore_index=True)
@@ -62,7 +83,6 @@ EOF
 }
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
-current_dir=$(pwd)
 script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
 project_dir=$(dirname ${script_dir})
 metadata_dir="${script_dir}/metadata"
