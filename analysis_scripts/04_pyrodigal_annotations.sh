@@ -13,34 +13,35 @@ if [ "$#" -lt 1 ]; then
 	exit 1
 fi
 
-current_dir=$(basename $PWD)
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(dirname "${script_dir}")"
 
-if [ $current_dir == "analysis_scripts" ]; then
-    echo "Currently in ${current_dir}"
-	out_dir="../pyrodigal_out"
-	mkdir -p "${out_dir}"
-	requirements="pyrodigal_requirements.txt"
-elif [ $current_dir == "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    out_dir="pyrodigal_out"
-	mkdir -p "${out_dir}"
-	requirements="analysis_scripts/pyrodigal_requirements.txt"
-elif [ -d "bacteria_genome_mining" ]; then
-    echo "Currently in ${current_dir}"
-    out_dir="bacteria_genome_mining/pyrodigal_out"
-	mkdir -p "${out_dir}"
-	requirements="bacteria_genome_mining/analysis_scripts/pyrodigal_requirements.txt"
-else
-    echo "Could not resolve the path to bacteria_genome_mining"
+# Create the output directory
+out_dir="${project_dir}/results/pyrodigal_out"
+mkdir -p "${out_dir}"
+
+# Check that all input files exist
+for fasta_file in "$@"; do
+    if [[ ! -f "${fasta_file}" ]]; then
+        echo "Error: Input FASTA file(s) not found"
+        exit 1
+    fi
+done
+
+# Set the number of CPUs, either based on the SLURM parameters or as a default of 1
+threads="${SLURM_CPUS_PER_TASK:-1}"
+
+# Check that pyrodigal is available
+if ! command -v pyrodigal >/dev/null 2>&1; then
+    echo "Error: pyrodigal was not found."
+    echo "Please activate an environment containing pyrodigal."
     exit 1
 fi
 
-# Create a virtual environment to load pyrodigal for parallel predictions
-virtualenv --no-download $SLURM_TMPDIR/env
-source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index --upgrade pip
-
-pip install --no-index -r $requirements
+echo "Using pyrodigal: $(command -v pyrodigal)"
+echo "Threads: ${threads}"
+echo "Output directory: ${out_dir}"
 
 # Loop through the file(s)
 for fasta_file in "$@"; do
@@ -54,9 +55,11 @@ for fasta_file in "$@"; do
 	else
 		fasta_id=$(basename "${fasta_file}")
 	fi
+	protein_out="${out_dir}/${fasta_id}_pyrodigal_prot.faa"
+	gene_out="${out_dir}/${fasta_id}_pyrodigal_gene.fna"
 	
 	# Check if annotation already exists
-	if [ -f "${out_dir}/${fasta_id}_pyrodigal_prot.faa" ]; then
+	if [ -f "${protein_out}" ]; then
 		echo "Annotations already exist. Skipping..."
 		continue
 	fi
@@ -64,10 +67,10 @@ for fasta_file in "$@"; do
 	pyrodigal -i "${fasta_file}" \
 	-p meta \
 	-g 11 \
-	-a "${out_dir}/${fasta_id}_pyrodigal_prot.faa" \
-	-d "${out_dir}/${fasta_id}_pyrodigal_gene.fna" \
-	-j $SLURM_CPUS_PER_TASK
-
+	-a "${protein_out}" \
+	-d "${gene_out}" \
+	-j "$threads"
+	
 	echo "Finished running pyrodigal on ${fasta_id}"
 done
 
