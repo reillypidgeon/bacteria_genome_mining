@@ -16,7 +16,7 @@ fi
 # Initialize variables
 taxon="$1"
 
-if [[ "$taxon" =~ ^[kpcofgs]__ ] ]]; then 
+if [[ "$taxon" =~ ^[kpcofgs]__ ]]; then 
     echo "The taxon is valid: ${taxon}"
 else
     echo "The taxon name is not valid"
@@ -48,7 +48,7 @@ if ! "$python_cmd" -c "import pandas" >/dev/null 2>&1; then
 fi
 
 echo "Using Python: $("$python_cmd" --version)"
-echo "Taxon of interest to download: $taxon"
+echo "Taxon of interest to extract from metadata: $taxon"
 
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
@@ -61,7 +61,7 @@ import glob
 import os
 
 table_dir = os.environ.get('table_dir')
-files = glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv")
+files = sorted(glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv"))
 
 # Check if files can be found
 if not files:
@@ -77,29 +77,36 @@ df_acc = pd.concat(dfs, ignore_index=True)
 df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
 
 # Write the output to a TSV file
-df_acc.to_csv(f"{table_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
+df_acc.to_csv(f"{table_dir}/bac120_metadata_r232_acc.tsv", sep='\t', index=False)
 
 EOF
 }
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
-script_dir=$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)
-project_dir=$(dirname ${script_dir})
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(dirname ${script_dir})"
 metadata_dir="${script_dir}/metadata"
+metadata_file="${metadata_dir}/bac120_metadata_r232_acc.tsv"
 
 # Check if the filtered metadata file already exists or prepare it
-if [ -f "${metadata_dir}/bac120_metadata_r232_acc.tsv" ]; then
+if [ -f "${metadata_file}" ]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
 else
     # Merge the chunked tables (1-6)
     merge_chunked_tables "${metadata_dir}"
 fi
 
+# Check that the final metadata file exists
+if [[ ! -f "${metadata_file}" ]]; then
+    echo "Error: Failed to create ${metadata_file}"
+    exit 1
+fi
+
 # Now extract the accessions and assemblies that match a partial string (user input)
 export taxon
 export metadata_dir
 
-python3 << 'EOF'
+"$python_cmd" << 'EOF'
 import pandas as pd
 import os
 
@@ -111,13 +118,13 @@ df = pd.read_csv(f"{metadata_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
 df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False)]
 
 # Now remove the taxonomy and ncbi_isolate columns and export without headers
-df_genomes = df_taxon[['accession', 'ncbi_assembly_name']]
+df_genomes = df_taxon[['accession', 'ncbi_assembly_name']].copy()
 # Replace spaces with underscores to avoid errors in later steps
-df_genomes['ncbi_assembly_name'] = df_genomes['ncbi_assembly_name'].str.replace(' ', '_')
+df_genomes['ncbi_assembly_name'] = df_genomes['ncbi_assembly_name'].str.replace(' ', '_', regex=False)
 file_name = f"genomes_{taxon_string}_r232.tsv".replace(" ", "_")
 df_genomes.to_csv(f"{metadata_dir}/{file_name}", sep='\t', header=False, index=False)
 
 EOF
 
-echo "Finished extracting genomes"
-echo "Can now download using the genome_download.sh script"
+echo "Finished extracting genome accessions and assemblies"
+echo "Can now download genomes relating to $taxon using the 02_genome_download.sh script"
