@@ -3,11 +3,11 @@
 ## Purpose
 To find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
 <br>
-Useful for looking at taxonomic distribution of genes (or proteins) and strain-level variation within species.
+Useful for looking at the taxonomic distribution of genes (or proteins) and strain-level variation within species.
 
 > [!IMPORTANT]
-> - The code in this repository is meant to run on a SLURM scheduler (Digital Research Alliance of Canada) <br>
-> - Some scripts will require internet access to work, so cannot be run in an interactive or scheduled job <br>
+> - Many of the scripts in this repository are formatted to run as SLURM (scheduled) jobs and are found in the ```slurm_scripts``` directory
+> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so cannot be run in an interactive or scheduled job <br>
 > - This repository is a work in progress - there may be bugs!
 
 ## Approach
@@ -17,30 +17,40 @@ Useful for looking at taxonomic distribution of genes (or proteins) and strain-l
 - Output tab-separated tables of all hits and best-hits for a given protein within a genome
 
 ## Usage
-### Genome Download
+### Genome Preparation and Download
 The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
+<br>
+The following are usage examples:
 ```
 # To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
+# Optional SLURM script
 bash 01_genome_extraction.sh "g__Enterocloster"
+sbatch 01_genome_extraction.slurm "g__Enterocloster"
 
 # To download the genomes from the created table
+# IMPORTANT: Requires internet access
 bash 02_genome_download.sh "metadata/genomes_g__Enterocloster_r232.tsv"
+
+# To unzip genomes and add accessions to fasta headers
+# Optional SLURM script
+bash 03_genome_preparation.sh
+sbatch 03_genome_preparation.slurm
 ```
 > [!NOTE]
-> - The genome unzipping step in the ```genome_download.sh``` script is run via the SLURM scheduler with default values for time and memory
-> - In cases where there are a large number of genomes, the allotted time and memory may become insufficient
-> - These would need to be changed in the ```genome_download.sh``` and possibly in the  ```add_accessions.sh scripts```
+> - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
+> - The most important modifications will likely be the time and memory, which are found near the top of the script
 
-### Analysis
+### Protein Prediction and Searching
 Since not all accessions and assemblies will have available protein fasta files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
 ```
 # To annotate genomes and predict protein-coding sequences
-sbatch pyrodigal_annotations.sh ../genomes/*.fna
+bash 04_pyrodigal_annotations.sh
+sbatch 04_pyrodigal_annotations.slurm
 
 # To search a fasta file of queries against proteins predicted from genomes
-sbatch mmseqs2_search.sh ../queries.faa ../pyrodigal_out/*.faa
+bash 05_mmseqs2_search.sh
+sbatch 05_mmseqs2_search.slurm
 ```
 > [!NOTE]
-> - The analysis scripts run scheduled jobs via the SLURM scheduler with default values for time and memory
-> - In cases where there are a large number of genomes, the allotted time and memory may become insufficient
-> - These would need to be changed in the ```pyrodigal_annotations.sh``` and ```mmseqs2_search.sh scripts```
+> - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
+> - The most important modifications will likely be the time and memory, which are found near the top of the script
