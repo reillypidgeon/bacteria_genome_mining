@@ -8,7 +8,7 @@ echo "These are used to build a URL that can access the NCBI FTP site."
 echo
 echo "Important: This script requires internet access to fetch the genomes"
 
-if [ "$#" -ne 1 ]; then
+if [[ "$#" -ne 1 ]]; then
     echo "Error: Invalid number of arguments."
     echo "Required: A tab-separated file containing a column with NCBI accession and a column with the NCBI assembly."
     echo "Usage: $0 <accessions_filename.tsv>"
