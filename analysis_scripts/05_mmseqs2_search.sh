@@ -33,16 +33,39 @@ out_dir="${project_dir}/results/mmseqs2_out"
 mkdir -p "${out_dir}"
 
 # Define the temporary directory for mmseqs2
+tmp_dir="${project_dir}/tmp"
+mkdir -p "${tmp_dir}"
 
+# Set the number of CPUs, either based on the SLURM parameters or as a default of 1
+threads="${SLURM_CPUS_PER_TASK:-1}"
 
-# Define the number of threads
+# Check that mmseqs2 is available
+if ! command -v mmseqs >/dev/null 2>&1; then
+    echo "Error: MMseqs2 was not found."
+    echo "Please activate an environment containing mmseqs2."
+    exit 1
+fi
 
+# Print the parameters for this job
+echo "==============================="
+echo "Query FASTA: ${query_fasta}"
+echo "Output directory: ${out_dir}"
+echo "Temporary directory: ${tmp_dir}"
+echo "Threads: ${threads}"
+echo "mmseqs2: $(command -v mmseqs)"
+echo "==============================="
 
 # Assign the output format
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
 
 # Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
 for subject_fasta in "${@:2}"; do
+	
+	# Check that the subject file exists
+    if [[ ! -f "${subject_fasta}" ]]; then
+        echo "Error: ${subject_fasta} file not found"
+        exit 1
+    fi
 	
     # Extract the fasta identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
@@ -54,9 +77,12 @@ for subject_fasta in "${@:2}"; do
     else
         fasta_id=$(basename "${subject_fasta}")
     fi
+
+	# Define the output file naming format
+	output_file="${out_dir}/${fasta_id}_mmseqs2.tsv"
 	
     # Check if results file already exists
-	if [ -f "${out_dir}/${fasta_id}_mmseqs2.tsv" ]; then
+	if [ -f "${output_file}" ]; then
 		echo "Results file for ${fasta_id} already exists. Skipping..."
 		continue
 	fi
@@ -65,12 +91,12 @@ for subject_fasta in "${@:2}"; do
 	
     # Run the search (auto-detects the input fasta formats)
     mmseqs easy-search \
-        $query_fasta \
-        $subject_fasta \
-        "${out_dir}/${fasta_id}_mmseqs2.tsv" \
-        tmp \
-        --threads $SLURM_CPUS_PER_TASK \
-        --format-output $out_format \
+        "${query_fasta}" \
+        "${subject_fasta}" \
+        "${output_file}" \
+        "${tmp_dir}" \
+        --threads "$threads" \
+        --format-output "${out_format}" \
         --min-seq-id 0.5 \
         -c 0.5
 done
@@ -78,13 +104,32 @@ done
 date
 echo "mmseqs2 search finished"
 
+#========================================================================
+# Annotate the results tables and merge into a table of all and best hits
+#========================================================================
+
+# Check that Python is available
+python_cmd="${PYTHON:-python3}"
+
+if ! command -v "${python_cmd}" >/dev/null 2>&1; then
+    echo "Error: Python executable not found: ${python_cmd}"
+    exit 1
+fi
+
+# Check that pandas is available
+if ! "${python_cmd}" -c "import pandas" >/dev/null 2>&1; then
+    echo "Error: Python package 'pandas' is not available."
+    echo "Please activate an environment containing pandas."
+    exit 1
+fi
+
 # Add column headers based on the output format
-module load python/3.14.2 scipy-stack/2026a
 
 export out_format
 export out_dir
+export project_dir
 
-python3 << 'EOF'
+"${python_cmd}" << 'EOF'
 import pandas as pd
 import os, glob, re, fnmatch
 from pathlib import Path
@@ -93,8 +138,9 @@ from pathlib import Path
 output_format = os.environ.get('out_format')
 output_format = output_format.split(",")
 
-# Set the ouptout directory
+# Set the ouptout directory and project directory
 output_directory = os.environ.get('out_dir')
+project_directory = os.environ.get('project_dir')
 
 print("Annotating output tables")
 
