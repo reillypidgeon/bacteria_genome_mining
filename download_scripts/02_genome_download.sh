@@ -24,6 +24,9 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 
+# Create the metadata directory in case it was deleted from the repository clone
+mkdir -p "${metadata_dir}"
+
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
 urls_file="${metadata_dir}/urls.txt"
 > "${urls_file}"
