@@ -71,3 +71,19 @@ then
 fi
 
 echo "Finished downloading genomes"
+
+# Additionally, download the full GTDB metadata table (if it doesn't already exist)
+# Check if the filtered metadata file already exists or prepare it
+if [ -f "${metadata_dir}/bac120_metadata_r232.tsv" ]; then
+    echo "Unzipped full metadata table already exists"
+elif [ -f "${metadata_dir}/bac120_metadata_r232.tsv.gz" ]; then
+    echo "Zipped file exists. Unzipping..."
+    gunzip "${metadata_dir}/bac120_metadata_r232.tsv.gz"
+else
+    echo "Downloading the metadata, unzipping, and filtering data"
+    cd "${metadata_dir}"
+    wget https://data.gtdb.ecogenomic.org/releases/release232/232.0/bac120_metadata_r232.tsv.gz
+    gunzip bac120_metadata_r232.tsv.gz
+fi
+
+echo "Finished downloading the full GTDB metadata"
