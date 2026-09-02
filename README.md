@@ -54,8 +54,8 @@ sbatch 04_pyrodigal_annotations.slurm ../genomes/*acc.fna
 
 # To search a user-defined fasta file of queries against proteins predicted from genomes
 
-bash 05_mmseqs2_search.sh ../results/queries.faa
-sbatch 05_mmseqs2_search.slurm ../results/queries.faa
+bash 05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
+sbatch 05_mmseqs2_search.slurm ../results/queries.faa ../results/pyrodigal_out/*.faa
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
