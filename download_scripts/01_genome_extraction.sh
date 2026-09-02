@@ -5,7 +5,7 @@ set -euo pipefail
 echo "Running $0"
 echo "This script extracts accession and assembly codes from the GTDB release 232 metadata table according to user input"
 
-if [ "$#" -ne 1 ]; then
+if [[ "$#" -ne 1 ]]; then
     echo "Error: Invalid number of arguments"
     echo "Required: A taxon according to GTDB taxonomy"
     echo "Usage: $0 <taxon_string>"
@@ -52,7 +52,7 @@ echo "Taxon of interest to extract from metadata: $taxon"
 
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
-table_dir=$1
+table_dir="$1"
 export table_dir
 
 "$python_cmd" << 'EOF'
@@ -84,12 +84,12 @@ EOF
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-project_dir="$(dirname ${script_dir})"
+project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 metadata_file="${metadata_dir}/bac120_metadata_r232_acc.tsv"
 
 # Check if the filtered metadata file already exists or prepare it
-if [ -f "${metadata_file}" ]; then
+if [[ -f "${metadata_file}" ]]; then
     echo "Filtered metadata already exists. No need for downloads or further processing."
 else
     # Merge the chunked tables (1-6)
@@ -115,9 +115,9 @@ metadata_dir = os.environ.get('metadata_dir')
 
 print(f"Searching the metadata table for: {taxon_string}")
 df = pd.read_csv(f"{metadata_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
-df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False)]
+df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False, regex=False)]
 
-# Now remove the taxonomy and ncbi_isolate columns and export without headers
+# Now select accession and ncbi_assembly_name columns and export without headers
 df_genomes = df_taxon[['accession', 'ncbi_assembly_name']].copy()
 # Replace spaces with underscores to avoid errors in later steps
 df_genomes['ncbi_assembly_name'] = df_genomes['ncbi_assembly_name'].str.replace(' ', '_', regex=False)
