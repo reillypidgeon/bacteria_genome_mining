@@ -19,6 +19,12 @@ fi
 accessions="$1"
 echo "Looking into $accessions"
 
+# Check if found
+if [[ ! -f "$accessions" ]]; then
+    echo "Error: $accessions file not found"
+    exit 1
+fi
+
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
@@ -36,12 +42,12 @@ while IFS= read -r line
 do
   base_url="https://ftp.ncbi.nlm.nih.gov/genomes/all"
   gb_rs=$(echo $line | grep -o "GC[AF]")
-  accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[1-9]")
+  accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+")
   accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
   first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
   second_three=$(echo $accession_numbers | grep -oP "(?<=^[0-9]{3})[0-9]{3}(?=[0-9]{3}$)")
   third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
-  assembly=$(echo $line | awk '{print $2}') # Extracts the second column
+  assembly=$(echo "$line" | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
   echo "$full_url" >> "${urls_file}"
@@ -57,7 +63,7 @@ cd "${genomes_dir}"
 echo "Attempting to download the genomes"
 
 if ! parallel -j 8 \
-    --joblog ${metadata_dir}/wget.log \
+    --joblog "${metadata_dir}/wget.log" \
     wget -nc :::: "${urls_file}"
 then
     echo "Warning: One or more downloads failed."
