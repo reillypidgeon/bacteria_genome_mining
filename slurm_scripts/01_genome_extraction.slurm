@@ -9,13 +9,6 @@
 
 set -euo pipefail
 
-# Get the project directory from the location of this SLURM script
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-project_dir="$(dirname "${script_dir}")"
-
-# Load required software
-module load python/3.14.2 scipy-stack/2026a
-
 # Taxon to extract based on user input
 if [[ "$#" -ne 1 ]]; then
     echo "Error: Taxon argument is required."
@@ -24,13 +17,29 @@ if [[ "$#" -ne 1 ]]; then
     exit 1
 fi
 
+# Set the taxon variable
 taxon="$1"
 
-echo "Running genome extraction"
+# Return to the directory from which sbatch was submitted
+cd "${SLURM_SUBMIT_DIR}"
+
+# Get the absolute path to the project
+project_dir="$(pwd)"
+
+# Define the script directory
+script_dir="${project_dir}/download_scripts"
+
+echo "SLURM submit directory: ${SLURM_SUBMIT_DIR}"
 echo "Project directory: ${project_dir}"
+echo "Script directory: ${script_dir}"
+
+# Load required software
+module load python scipy-stack
+
+echo "Running genome extraction"
 echo "Taxon: $taxon"
 
 # Run the portable genome extraction script
-bash "${project_dir}/download_scripts/01_genome_extraction.sh" "$taxon"
+bash "${script_dir}/01_genome_extraction.sh" "$taxon"
 
 echo "Genome extraction complete"
