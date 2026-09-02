@@ -44,12 +44,13 @@ sbatch 03_genome_preparation.slurm
 Since not all accessions and assemblies will have available protein fasta files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
 ```
 # To annotate genomes and predict protein-coding sequences
-bash 04_pyrodigal_annotations.sh ../genomes/*.fna
-sbatch 04_pyrodigal_annotations.slurm ../genomes/*.fna
+# The *acc.fna used here represents FASTA files that have modified headers (added accessions)
+bash 04_pyrodigal_annotations.sh ../genomes/*acc.fna
+sbatch 04_pyrodigal_annotations.slurm ../genomes/*acc.fna
 
-# To search a fasta file of queries against proteins predicted from genomes
-bash 05_mmseqs2_search.sh
-sbatch 05_mmseqs2_search.slurm
+# To search a user-defined fasta file of queries against proteins predicted from genomes
+bash 05_mmseqs2_search.sh ../results/queries.faa
+sbatch 05_mmseqs2_search.slurm ../results/queries.faa
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
