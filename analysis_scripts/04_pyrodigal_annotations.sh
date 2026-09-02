@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=pyrodigal
-#SBATCH --time=12:00:00
-#SBATCH --mem=100G
-#SBATCH --cpus-per-task=8
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
-
-date
 set -euo pipefail
-
-# Load required modules
-module load StdEnv/2023 python/3.11.5
-echo "Modules loaded"
 
 echo "Running $0"
 echo "This script predicts proteins from one or more nucleotide fasta files using pyrodigal."
