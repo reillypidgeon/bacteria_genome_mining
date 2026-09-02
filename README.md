@@ -17,7 +17,7 @@ Useful for looking at the taxonomic distribution of genes (or proteins) and stra
 - Output tab-separated tables of all hits and best-hits for a given protein within a genome
 
 ## Usage
-### Genome Preparation and Download
+### Genome FASTA Preparation and Downloading
 The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
 <br>
 The following are usage examples:
