@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name=mmseqs2
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
-#SBATCH --time=08:00:00
-#SBATCH --mem=64G
-#SBATCH --cpus-per-task=4
-
 set -euo pipefail
 
 echo "Running $0"
@@ -21,8 +14,6 @@ if [ "$#" -lt 2 ]; then
     echo "Example: $0 queries.faa genomes/*.faa"
     exit 1
 fi
-
-module load StdEnv/2023 mmseqs2/17-b804f cudacore/.12.6.3
 
 # Assign command line argument for the query
 query_fasta="$1"
