@@ -138,7 +138,7 @@ from pathlib import Path
 output_format = os.environ.get('out_format')
 output_format = output_format.split(",")
 
-# Set the ouptout directory and project directory
+# Set the output directory and project directory
 output_directory = os.environ.get('out_dir')
 project_directory = os.environ.get('project_dir')
 
@@ -204,6 +204,7 @@ if metadata_path.is_file():
     merged_metadata_df = pd.merge(merged_df, metadata_df, left_on='accession', right_on='accession')
 else:
     print("Cannot find metadata table... exporting to TSV without metadata")
+	merged_metadata_df = merged_df.copy()
 
 # Filter by best hit (for each target protein)
 merged_metadata_df_bh = merged_metadata_df.loc[merged_metadata_df.groupby('target')['pident'].idxmax()]
