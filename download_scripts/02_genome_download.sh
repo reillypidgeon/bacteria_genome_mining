@@ -25,7 +25,8 @@ project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
-touch "${metadata_dir}/urls.txt"
+urls_file="${metadata_dir}/urls.txt"
+> "${urls_file}"
 
 # Go line-by-line and build up URLs for each genome of interest
 while IFS= read -r line
@@ -40,7 +41,7 @@ do
   assembly=$(echo $line | awk '{print $2}') # Extracts the second column
   full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
   echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
-  echo "$full_url" >> "${metadata_dir}/urls.txt"
+  echo "$full_url" >> "${urls_file}"
 done < "$accessions"
 
 # Create a new directory for the genomes that will be downloaded
