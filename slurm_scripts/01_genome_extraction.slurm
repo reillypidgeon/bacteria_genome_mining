@@ -29,10 +29,8 @@ taxon="$1"
 echo "Running genome extraction"
 echo "Project directory: ${project_dir}"
 echo "Taxon: $taxon"
-echo
 
 # Run the portable genome extraction script
 bash "${project_dir}/download_scripts/01_genome_extraction.sh" "$taxon"
 
-echo
 echo "Genome extraction complete"
