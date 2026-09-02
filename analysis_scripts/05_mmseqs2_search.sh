@@ -135,8 +135,7 @@ import os, glob, re, fnmatch
 from pathlib import Path
 
 # Generate a list for the headers
-output_format = os.environ.get('out_format')
-output_format = output_format.split(",")
+output_format = os.environ.get('out_format').split(",")
 
 # Set the output directory and project directory
 output_directory = os.environ.get('out_dir')
@@ -144,64 +143,89 @@ project_directory = os.environ.get('project_dir')
 
 print("Annotating output tables")
 
+# Find mmseqs2 result files
+result_files = sorted(output_directory.glob("*_mmseqs2.tsv"))
+
+# Skip merged results from previous executions
+result_files = [
+    file for file in result_files
+    if file.name not in {
+        "merged_mmseqs2.tsv",
+        "merged_best_hits_mmseqs2.tsv",
+    }
+]
+
+if not result_files:
+    raise FileNotFoundError(
+        f"No mmseqs2 result files found in {output_directory}"
+    )
+
+
 # Generate an empty list to populate
 dfs = []
 
 # Loop through the results tables
-for file in glob.glob(f"{output_directory}/*_mmseqs2.tsv"):
-    df = pd.read_csv(file, sep="\t", header=None, names = output_format, low_memory=False)
-    file_name = os.path.basename(file)
+for file in result_files:
 	
-    # Skip merged results if present from a previous execution of this script
-    if fnmatch.fnmatch(file_name, "merged*mmseqs2.tsv"):
-        print("Skipping merged results")
-        continue
-    
-    # Extract the accession from the file_name and add to the dataframes
-    print(f"Extracting the accession for {file_name}")
-    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]+"
-    accession = re.search(pattern, file_name).group(0)
-    accession = accession.upper()
-    print(accession)
-    
-    # Check if the dataframe is empty
-    if df.empty:
+    file_name = file.name
+    print(f"Processing {file_name}")
+
+    # Handle empty result files
+    if file.stat().st_size == 0:
         print(f"Dataframe for {file_name} is empty")
-        print("Adding a row")
-        df["file_name"] = None
-        df["accession"] = None
-        # Add in the file_name in a single row
-        df.loc[0] = {
-            "file_name": file_name,
-            "pident": 0.0,
-            "target": f"NA for {accession}"
-        }
+        df = pd.DataFrame(columns=output_format)
     else:
-        print(f"Dataframe for {file_name} contains hits")
-        df["file_name"] = file_name
-    
+        df = pd.read_csv(file, sep="\t", header=None, names=output_format, low_memory=False)
+
+    # Extract the accession from the filename
+    pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]+"
+    match = re.search(pattern, file_name)
+
+    if match is None:
+        raise ValueError(
+            f"Could not extract NCBI accession from filename: {file_name}"
+        )
+
+    accession = match.group(0).upper()
+    print(f"Accession: {accession}")
+
+    # Add a placeholder row if there are no hits
+    if df.empty:
+        print("No hits found. Adding placeholder row.")
+
+        df.loc[0, "pident"] = 0.0
+        df.loc[0, "target"] = f"NA for {accession}"
+
+    else:
+        print(f"Found {len(df)} hits")
+
+    # Add file and accession information
+    df["file_name"] = file_name
     df["accession"] = accession
-    
-    # Append the df to the list of dfs and go through the loop again
-    print("Appending to the list of dfs")
+
     dfs.append(df)
 
 # Merge the dataframes in dfs
 merged_df = pd.concat(dfs, ignore_index=True)
-merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
 
 # Reorder the columns according to an extended output_format list
 output_format.extend(["accession", "file_name"])
 merged_df = merged_df[output_format]
 
-# Now combine the merged dfs with the metadata table used to get the accessions and assemblies
-metadata_path = Path("bac120_metadata_r232.tsv")
+# Now (optionally) combine the merged dfs with the metadata table
+metadata_path = (
+    project_directory
+    / "download_scripts"
+    / "metadata"
+    / "bac120_metadata_r232.tsv"
+)
+
 if metadata_path.is_file():
     print("Merging with metadata")
     metadata_df = pd.read_csv(metadata_path, sep='\t')
     metadata_df = metadata_df[['accession', 'ncbi_assembly_name', 'gtdb_taxonomy', 'gtdb_representative', 'ncbi_isolate', 'ncbi_strain_identifiers', 'ncbi_isolation_source']]
     metadata_df['accession'] = metadata_df['accession'].str.replace(r'[RG][SB]_', '', regex=True)
-    merged_metadata_df = pd.merge(merged_df, metadata_df, left_on='accession', right_on='accession')
+    merged_metadata_df = pd.merge(merged_df, metadata_df, on='accession', how='left')
 else:
     print("Cannot find metadata table... exporting to TSV without metadata")
 	merged_metadata_df = merged_df.copy()
