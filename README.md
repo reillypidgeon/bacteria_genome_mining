@@ -20,15 +20,37 @@ Useful for looking at the taxonomic distribution of genes (or proteins) and stra
 The following tools and packages need to be installed for the scripts in this repository to work
 - Python
 - GNU parallel
-- [pandas]
-- [scipy]
-- [pyrodigal]
+- [pandas](https://github.com/pandas-dev/pandas)
+- [scipy](https://github.com/scipy/scipy)
+- [pyrodigal](https://github.com/althonos/pyrodigal)
 - [mmseqs2](https://github.com/soedinglab/MMseqs2)
 
-It is best to create a virtual environment that has all these dependencies installed and available
+On a local machine, it is best to create a Python virtual environment that has all these dependencies installed and available.
 ```
-# In the project directory (bacteria_genome_mining)
+# In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env (or whatever you want)
+python -m venv bgm_env
+source bgm_env/bin/activate
 
+# Then install all required packages based on the requirements.txt file in the project directory
+pip install -r requirements.txt
+```
+<br>
+On a HPC cluster like those from the Digital Research Alliance of Canada, modules need to first be loaded. <br>
+
+```
+# Loading modules
+module load python
+module load scipy-stack
+module load mmseqs2
+
+# In the slurm_scripts directory, the 04_pyrodigal_annotations.slurm script creates a virtual environment and installs pyrodigal using requirements in analysis_scripts/pyrodigal_requirements.txt
+module load python
+
+virtualenv --no-download "${SLURM_TMPDIR}/pyrodigal_env"
+source "${SLURM_TMPDIR}/pyrodigal_env/bin/activate"
+
+pip install --no-index --upgrade pip
+pip install --no-index -r "${project_dir}/analysis_scripts/pyrodigal_requirements.txt"
 ```
 
 ## Usage
