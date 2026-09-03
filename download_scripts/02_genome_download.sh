@@ -45,7 +45,7 @@ do
     accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+")
     accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
     first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
-    second_three=$(echo $accession_numbers | grep -oP "(?<=^[0-9]{3})[0-9]{3}(?=[0-9]{3}$)")
+    second_three=$(echo $accession_numbers | grep -oE '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
     third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
     assembly=$(echo "$line" | awk '{print $2}') # Extracts the second column
     full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
