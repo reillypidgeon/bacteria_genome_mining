@@ -25,6 +25,7 @@ The following tools and packages need to be installed for the scripts in this re
 - [pyrodigal](https://github.com/althonos/pyrodigal)
 - [mmseqs2](https://github.com/soedinglab/MMseqs2)
 
+<br>
 On a local machine, it is best to create a Python virtual environment that has all these dependencies installed and available.
 ```
 # In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env (or whatever you want)
