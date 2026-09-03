@@ -53,7 +53,6 @@ module load python mmseqs2 scipy-stack
 
 # Check installation
 echo "Python: $(which python)"
-echo "mmseqs2: $(which mmseqs2)"
 
 # Run mmseqs2
 bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" "${query_fasta}" "${@:2}"
