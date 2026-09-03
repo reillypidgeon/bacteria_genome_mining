@@ -18,8 +18,8 @@ query_fasta="$1"
 
 # Check if the query file exists
 if [[ ! -f "${query_fasta}" ]]; then
-	echo "Error: Query FASTA file not found"
-	exit 1
+    echo "Error: Query FASTA file not found"
+    exit 1
 fi
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
@@ -58,16 +58,14 @@ out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,
 
 # Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
 for subject_fasta in "${@:2}"; do
-	
-	# Check that the subject file exists
+    # Check that the subject file exists
     if [[ ! -f "${subject_fasta}" ]]; then
         echo "Error: ${subject_fasta} file not found"
         exit 1
     fi
-	
-    # Extract the fasta identity
+	# Extract the fasta identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
-    	fasta_id=$(basename "${subject_fasta}" .fasta)
+        fasta_id=$(basename "${subject_fasta}" .fasta)
     elif [[ "${subject_fasta}" == *.faa ]]; then
         fasta_id=$(basename "${subject_fasta}" .faa)
     elif [[ "${subject_fasta}" == *.fna ]]; then
@@ -75,18 +73,17 @@ for subject_fasta in "${@:2}"; do
     else
         fasta_id=$(basename "${subject_fasta}")
     fi
-
-	# Define the output file naming format
-	output_file="${out_dir}/${fasta_id}_mmseqs2.tsv"
-	
+    # Define the output file naming format
+    output_file="${out_dir}/${fasta_id}_mmseqs2.tsv"
+    
     # Check if results file already exists
-	if [ -f "${output_file}" ]; then
-		echo "Results file for ${fasta_id} already exists. Skipping..."
-		continue
-	fi
-	
-	echo "Searching ${fasta_id} using mmseqs2"
-	
+    if [ -f "${output_file}" ]; then
+        echo "Results file for ${fasta_id} already exists. Skipping..."
+        continue
+    fi
+    
+    echo "Searching ${fasta_id} using mmseqs2"
+    
     # Run the search (auto-detects the input fasta formats)
     mmseqs easy-search \
         "${query_fasta}" \
@@ -158,7 +155,6 @@ if not result_files:
         f"No mmseqs2 result files found in {output_directory}"
     )
 
-
 # Generate an empty list to populate
 dfs = []
 
@@ -183,24 +179,19 @@ for file in result_files:
         raise ValueError(
             f"Could not extract NCBI accession from filename: {file_name}"
         )
-
     accession = match.group(0).upper()
     print(f"Accession: {accession}")
 
     # Add a placeholder row if there are no hits
     if df.empty:
         print("No hits found. Adding placeholder row.")
-
         df.loc[0, "pident"] = 0.0
         df.loc[0, "target"] = f"NA for {accession}"
-
     else:
         print(f"Found {len(df)} hits")
-
     # Add file and accession information
     df["file_name"] = file_name
     df["accession"] = accession
-
     dfs.append(df)
 
 # Merge the dataframes in dfs
@@ -226,7 +217,7 @@ if metadata_path.is_file():
     merged_metadata_df = pd.merge(merged_df, metadata_df, on='accession', how='left')
 else:
     print("Cannot find metadata table... exporting to TSV without metadata")
-	merged_metadata_df = merged_df.copy()
+    merged_metadata_df = merged_df.copy()
 
 # Filter by best hit (for each target protein)
 merged_metadata_df_bh = merged_metadata_df.loc[merged_metadata_df.groupby('target')['pident'].idxmax()]
@@ -235,7 +226,6 @@ merged_metadata_df_bh = merged_metadata_df_bh.reset_index(drop=True)
 # Export the resulting files to TSV
 merged_metadata_df.to_csv(f"{output_directory}/merged_mmseqs2.tsv", sep="\t", index=False)
 merged_metadata_df_bh.to_csv(f"{output_directory}/merged_best_hits_mmseqs2.tsv", sep="\t", index=False)
-
 
 EOF
 
