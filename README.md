@@ -35,9 +35,11 @@ source bgm_env/bin/activate
 
 # Then install all required packages based on the requirements.txt file in the project directory
 pip install -r requirements.txt
+
+# Then run the scripts as shown in the Usage section below
 ```
 <br>
-On a HPC cluster like those from the Digital Research Alliance of Canada, modules need to first be loaded. <br>
+On a HPC cluster like those from the Digital Research Alliance of Canada, modules need to first be loaded. These steps are already included in the slurm-ready scripts in the slurm_scripts directory. <br>
 
 ```
 # Loading modules
