@@ -139,11 +139,12 @@ project_directory = os.environ.get('project_dir')
 print("Annotating output tables")
 
 # Find mmseqs2 result files
-result_files = sorted(output_directory.glob("*_mmseqs2.tsv"))
+output_path = Path(output_directory)
+result_files = sorted(output_path.glob("*_mmseqs2.tsv"))
 
 # Skip merged results from previous executions
 result_files = [
-    file for file in result_files
+	file for file in result_files
     if file.name not in {
         "merged_mmseqs2.tsv",
         "merged_best_hits_mmseqs2.tsv",
@@ -160,11 +161,9 @@ dfs = []
 
 # Loop through the results tables
 for file in result_files:
-	
     file_name = file.name
     print(f"Processing {file_name}")
-
-    # Handle empty result files
+	# Handle empty result files
     if file.stat().st_size == 0:
         print(f"Dataframe for {file_name} is empty")
         df = pd.DataFrame(columns=output_format)
