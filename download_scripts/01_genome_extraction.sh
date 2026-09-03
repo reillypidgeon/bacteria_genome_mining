@@ -34,43 +34,18 @@ fi
 
 echo "Using Python: $("$python_cmd" --version)"
 
-# Define a function that will merge chunked accession tables
-merge_chunked_tables() {
-table_dir="$1"
-export table_dir
-
-"$python_cmd" << 'EOF'
-import pandas as pd
-import glob
-import os
-
-table_dir = os.environ.get('table_dir')
-files = sorted(glob.glob(f"{table_dir}/bac120_metadata_r232_acc_*.tsv"))
-
-# Check if files can be found
-if not files:
-    raise FileNotFoundError(f"No chunked metadata files found in {table_dir}")
-
-# Read the tables
-dfs = []
-for file in files:
-    df = pd.read_csv(file, sep='\t')
-    dfs.append(df)
-
-df_acc = pd.concat(dfs, ignore_index=True)
-df_acc = df_acc.sort_values(by = 'accession', ignore_index = True)
-
-# Write the output to a TSV file
-df_acc.to_csv(f"{table_dir}/bac120_metadata_r232_acc.tsv", sep='\t', index=False)
-
-EOF
-}
-
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 metadata_file="${metadata_dir}/bac120_metadata_r232_acc.tsv"
+
+# Define a function that will merge chunked accession tables
+merge_chunked_tables() {
+table_dir="$1"
+export table_dir
+"$python_cmd" "${script_dir}/merge_chunked_tables.py"
+}
 
 # Check if the filtered metadata file already exists or prepare it
 if [[ -f "${metadata_file}" ]]; then
