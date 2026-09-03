@@ -199,12 +199,7 @@ for file in result_files:
 merged_df = pd.concat(dfs, ignore_index=True)
 
 # Now (optionally) combine the merged dfs with the metadata table
-metadata_path = (
-    project_directory
-    / "download_scripts"
-    / "metadata"
-    / "bac120_metadata_r232_acc.tsv"
-)
+metadata_path = Path(f"{project_directory}/download_scripts/metadata/bac120_metadata_r232_acc.tsv")
 
 if metadata_path.is_file():
     print("Merging with metadata")
