@@ -13,6 +13,12 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
+#========================================================================
+# WANT TO ADD OPTIONAL FLAGS HERE THAT WILL REPLACE DEFAULT VALUES
+# sequence id
+# coverage
+#========================================================================
+
 # Assign command line argument for the query
 query_fasta="$1"
 
