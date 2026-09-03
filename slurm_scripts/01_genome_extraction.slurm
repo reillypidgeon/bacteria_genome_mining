@@ -3,22 +3,21 @@
 #SBATCH --job-name=genome_extraction
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
-#SBATCH --time=00:15:00
+#SBATCH --time=00:10:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 
 set -euo pipefail
 
-# Taxon to extract based on user input
-if [[ "$#" -ne 1 ]]; then
-    echo "Error: Taxon argument is required."
-    echo "Usage: sbatch 01_genome_extraction.slurm <taxon_string>"
-    echo "Example: sbatch 01_genome_extraction.slurm 'g__Enterocloster'"
+# Taxa to extract based on user input
+if [[ "$#" -lt 1 ]]; then
+    echo "Error: Invalid number of arguments"
+    echo "Required: At least one taxon according to GTDB taxonomy"
+    echo "Usage: $0 <taxon_string(s)>"
+    echo "Example: $0 'g__Enterocloster'"
+    echo "Example: $0 'g__Enterocloster' 's__Hungatella hathewayi'"
     exit 1
 fi
-
-# Set the taxon variable
-taxon="$1"
 
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
@@ -46,9 +45,8 @@ echo "Project directory: ${project_dir}"
 module load python scipy-stack
 
 echo "Running genome extraction"
-echo "Taxon: $taxon"
 
 # Run the portable genome extraction script
-bash "${project_dir}/download_scripts/01_genome_extraction.sh" "$taxon"
+bash "${project_dir}/download_scripts/01_genome_extraction.sh" "$@"
 
 echo "Genome extraction complete"
