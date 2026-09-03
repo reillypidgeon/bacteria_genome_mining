@@ -79,8 +79,8 @@ bash 02_genome_download.sh "metadata/genomes_*_r232.tsv"
 # To unzip genomes and add accessions to FASTA headers
 # Optional SLURM script
 
-bash 03_genome_preparation.sh
-sbatch 03_genome_preparation.slurm
+bash 03_genome_preparation.sh "../genomes"
+sbatch 03_genome_preparation.slurm "../genomes"
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
