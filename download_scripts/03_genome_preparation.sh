@@ -6,7 +6,7 @@ if [[ "$#" -ne 1 ]]; then
     echo "Error: Invalid number of arguments"
     echo "Required: A directory containing the FASTA files to unzip and annotate"
     echo "Usage: $0 <fasta_directory>"
-    echo "Example: $0 'genomes'"
+    echo "Example: $0 'genomes/'"
     exit 1
 fi
 
