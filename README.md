@@ -59,7 +59,7 @@ pip install --no-index -r "${project_dir}/analysis_scripts/pyrodigal_requirement
 
 ## Usage
 ### Genome FASTA Preparation and Downloading
-The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
+The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
 <br>
 The following are usage examples:
 ```
@@ -67,14 +67,16 @@ The following are usage examples:
 # Optional SLURM script
 
 bash 01_genome_extraction.sh "g__Enterocloster"
+bash 01_genome_extraction.sh "g__Enterocloster" "s__Hungatella hathewayi"
 sbatch 01_genome_extraction.slurm "g__Enterocloster"
 
 # To download the genomes from the created table
 # IMPORTANT: Requires internet access
 
 bash 02_genome_download.sh "metadata/genomes_g__Enterocloster_r232.tsv"
+bash 02_genome_download.sh "metadata/genomes_*_r232.tsv"
 
-# To unzip genomes and add accessions to fasta headers
+# To unzip genomes and add accessions to FASTA headers
 # Optional SLURM script
 
 bash 03_genome_preparation.sh
@@ -85,7 +87,7 @@ sbatch 03_genome_preparation.slurm
 > - The most important modifications will likely be the time and memory, which are found near the top of the script
 
 ### Protein Prediction and Searching
-Since not all accessions and assemblies will have available protein fasta files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
+Since not all accessions and assemblies will have available protein FASTA files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
 ```
 # To annotate genomes and predict protein-coding sequences
 # The *acc.fna used here represents FASTA files that have modified headers (added accessions)
@@ -93,7 +95,7 @@ Since not all accessions and assemblies will have available protein fasta files 
 bash 04_pyrodigal_annotations.sh ../genomes/*acc.fna
 sbatch 04_pyrodigal_annotations.slurm ../genomes/*acc.fna
 
-# To search a user-defined fasta file of queries against proteins predicted from genomes
+# To search a user-defined FASTA file of queries against proteins predicted from genomes
 
 bash 05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
 sbatch 05_mmseqs2_search.slurm ../results/queries.faa ../results/pyrodigal_out/*.faa
