@@ -16,6 +16,21 @@ Useful for looking at the taxonomic distribution of genes (or proteins) and stra
 - Search for homologous sequences in the newly-created protein catalogues using [mmseqs2](https://github.com/soedinglab/MMseqs2)
 - Output tab-separated tables of all hits and best-hits for a given protein within a genome
 
+## Dependencies
+The following tools and packages need to be installed for the scripts in this repository to work
+- Python
+- GNU parallel
+- [pandas]
+- [scipy]
+- [pyrodigal]
+- [mmseqs2](https://github.com/soedinglab/MMseqs2)
+
+It is best to create a virtual environment that has all these dependencies installed and available
+```
+# In the project directory (bacteria_genome_mining)
+
+```
+
 ## Usage
 ### Genome FASTA Preparation and Downloading
 The first step is to extract the genomes relating to a user-defined taxonomic level from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be tracked back to a single accession, the accession for each genome is added to fasta headers. <br>
