@@ -27,6 +27,7 @@ The following tools and packages need to be installed for the scripts in this re
 
 <br>
 On a local machine, it is best to create a Python virtual environment that has all these dependencies installed and available.
+
 ```
 # In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env (or whatever you want)
 python -m venv bgm_env
