@@ -144,7 +144,7 @@ result_files = sorted(output_path.glob("*_mmseqs2.tsv"))
 
 # Skip merged results from previous executions
 result_files = [
-	file for file in result_files
+    file for file in result_files
     if file.name not in {
         "merged_mmseqs2.tsv",
         "merged_best_hits_mmseqs2.tsv",
@@ -163,25 +163,25 @@ dfs = []
 for file in result_files:
     file_name = file.name
     print(f"Processing {file_name}")
-	
-	# Handle empty result files
+    
+    # Handle empty result files
     if file.stat().st_size == 0:
         print(f"Dataframe for {file_name} is empty")
         df = pd.DataFrame(columns=output_format)
     else:
         df = pd.read_csv(file, sep="\t", header=None, names=output_format, low_memory=False)
-	
+    
     # Extract the accession from the filename
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]+"
     match = re.search(pattern, file_name)
-	
+    
     if match is None:
         raise ValueError(
             f"Could not extract NCBI accession from filename: {file_name}"
         )
     accession = match.group(0).upper()
     print(f"Accession: {accession}")
-	
+    
     # Add a placeholder row if there are no hits
     if df.empty:
         print("No hits found. Adding placeholder row.")
@@ -189,10 +189,10 @@ for file in result_files:
         df.loc[0, "target"] = f"NA for {accession}"
     else:
         print(f"Found {len(df)} hits")
-	
+    
     # Add file and accession information
     df["accession"] = accession
-	df["file_name"] = file_name
+    df["file_name"] = file_name
     dfs.append(df)
 
 # Merge the dataframes in dfs
