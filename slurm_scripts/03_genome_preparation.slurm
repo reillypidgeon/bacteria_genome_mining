@@ -9,6 +9,16 @@
 
 set -euo pipefail
 
+if [[ "$#" -ne 1 ]]; then
+    echo "Error: Invalid number of arguments"
+    echo "Required: A directory containing the FASTA files to unzip and annotate"
+    echo "Usage: $0 <fasta_directory>"
+    echo "Example: $0 'genomes'"
+    exit 1
+fi
+
+genomes_dir="$1"
+
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
 
@@ -32,7 +42,7 @@ echo "SLURM submission directory: ${SLURM_SUBMIT_DIR}"
 echo "Project directory: ${project_dir}"
 
 # Run the portable genome preparation script
-bash "${project_dir}/download_scripts/03_genome_preparation.sh"
+bash "${project_dir}/download_scripts/03_genome_preparation.sh" "${genomes_dir}"
 
 echo
 echo "Genome preparation complete"
