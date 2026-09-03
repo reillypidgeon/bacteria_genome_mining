@@ -49,7 +49,7 @@ echo "SLURM submission directory: ${SLURM_SUBMIT_DIR}"
 echo "Project directory: ${project_dir}"
 
 # Load Python
-module load python mmseqs2
+module load python mmseqs2 scipy-stack
 
 # Check installation
 echo "Python: $(which python)"
