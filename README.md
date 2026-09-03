@@ -30,7 +30,7 @@ On a local machine, it is best to create a Python virtual environment that has a
 
 ```
 # In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env (or whatever you want)
-python -m venv bgm_env
+python3 -m venv bgm_env
 source bgm_env/bin/activate
 
 # Then install all required packages based on the requirements.txt file in the project directory
