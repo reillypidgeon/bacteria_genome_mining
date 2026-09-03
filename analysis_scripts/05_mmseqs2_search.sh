@@ -163,24 +163,25 @@ dfs = []
 for file in result_files:
     file_name = file.name
     print(f"Processing {file_name}")
+	
 	# Handle empty result files
     if file.stat().st_size == 0:
         print(f"Dataframe for {file_name} is empty")
         df = pd.DataFrame(columns=output_format)
     else:
         df = pd.read_csv(file, sep="\t", header=None, names=output_format, low_memory=False)
-
+	
     # Extract the accession from the filename
     pattern = r"^[Gg][Cc][AaFf]_[0-9]{9}\.[0-9]+"
     match = re.search(pattern, file_name)
-
+	
     if match is None:
         raise ValueError(
             f"Could not extract NCBI accession from filename: {file_name}"
         )
     accession = match.group(0).upper()
     print(f"Accession: {accession}")
-
+	
     # Add a placeholder row if there are no hits
     if df.empty:
         print("No hits found. Adding placeholder row.")
@@ -188,24 +189,21 @@ for file in result_files:
         df.loc[0, "target"] = f"NA for {accession}"
     else:
         print(f"Found {len(df)} hits")
+	
     # Add file and accession information
-    df["file_name"] = file_name
     df["accession"] = accession
+	df["file_name"] = file_name
     dfs.append(df)
 
 # Merge the dataframes in dfs
 merged_df = pd.concat(dfs, ignore_index=True)
-
-# Reorder the columns according to an extended output_format list
-output_format.extend(["accession", "file_name"])
-merged_df = merged_df[output_format]
 
 # Now (optionally) combine the merged dfs with the metadata table
 metadata_path = (
     project_directory
     / "download_scripts"
     / "metadata"
-    / "bac120_metadata_r232.tsv"
+    / "bac120_metadata_r232_acc.tsv"
 )
 
 if metadata_path.is_file():
