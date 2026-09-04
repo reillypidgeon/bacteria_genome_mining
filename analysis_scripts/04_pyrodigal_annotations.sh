@@ -3,13 +3,13 @@
 set -euo pipefail
 
 echo "Running $0"
-echo "This script predicts proteins from one or more nucleotide fasta files using pyrodigal."
+echo "This script predicts proteins from one or more nucleotide FASTA files using pyrodigal."
 
 if [ "$#" -lt 1 ]; then
 	echo "Error: Invalid number of arguments."
-	echo "Required: Nucleic acid fasta file(s)"
+	echo "Required: Nucleic acid FASTA file(s)"
 	echo "Usage: $0 <fasta_fna file(s)>"
-	echo "Example: bash $0 genomes/*.fna"
+	echo "Example: bash $0 ../genomes/*.fna"
 	exit 1
 fi
 
@@ -55,10 +55,11 @@ for fasta_file in "$@"; do
 	else
 		fasta_id=$(basename "${fasta_file}")
 	fi
+	
 	protein_out="${out_dir}/${fasta_id}_pyrodigal_prot.faa"
 	gene_out="${out_dir}/${fasta_id}_pyrodigal_gene.fna"
 	
-	# Check if annotation already exists
+	# Check if protein annotation already exists
 	if [ -f "${protein_out}" ]; then
 		echo "Annotations already exist. Skipping..."
 		continue
