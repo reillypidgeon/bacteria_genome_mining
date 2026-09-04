@@ -125,4 +125,4 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"/*.fna
 
-bash ${analysis_scripts_dir}/05_mmsequs2_search.sh --min-seq-id "${min_seq_id}" --min_coverage "${min_coverage}" "${query_fasta}" "${subject_fastas[@]}"
+bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min_coverage "${min_coverage}" "${query_fasta}" "${subject_fastas[@]}"
