@@ -57,7 +57,7 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 
 ## Usage
 ### Full Analysis
-This tool can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps)
+This tool can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps). <br>
 To run the tool on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
 ```
 bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
