@@ -1,4 +1,4 @@
-# Bacteria Genome Mining
+# Bacteria Genome Mining (BGM)
 
 ## Purpose
 To find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
@@ -56,7 +56,13 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 ```
 
 ## Usage
-### Genome FASTA Preparation and Downloading
+### Full Analysis
+This tool can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps)
+To run the tool on a local machine or in an interactive SLURM job (with internet access), you can call the following script:
+```
+```
+
+### Genome FASTA Preparation & Downloading
 The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be used to create URLs to download genome FASTA files from the NCBI. To ensure that contigs from each genome can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
 <br>
 The following are usage examples: <br>
@@ -90,7 +96,7 @@ sbatch 03_genome_preparation.slurm "../genomes/"
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
 > - The most important modifications will likely be the time and memory, which are found near the top of the script
 
-### Protein Prediction and Searching
+### Protein Prediction & Searching
 Since not all accessions and assemblies will have available protein FASTA files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
 **04_pyrodigal_annotations**
 ```
