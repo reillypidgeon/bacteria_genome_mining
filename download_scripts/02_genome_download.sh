@@ -73,7 +73,6 @@ cd "${genomes_dir}"
 echo "Attempting to download genomes"
 
 if [[ ! -s "${urls_file}" ]]; then
-    echo "All requested genomes have already been downloaded and prepared."
     echo "Nothing to download."
     exit 0
 fi
