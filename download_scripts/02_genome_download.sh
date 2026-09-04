@@ -26,6 +26,10 @@ metadata_dir="${script_dir}/metadata"
 out_dir="${project_dir}/results/accessions_out"
 mkdir -p "${out_dir}"
 
+# Create a new directory for the genomes that will be downloaded
+genomes_dir="${project_dir}/genomes"
+mkdir -p "${genomes_dir}"
+
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
 urls_file="${out_dir}/urls.txt"
 > "${urls_file}"
@@ -49,27 +53,37 @@ for table in "$@"; do
         second_three=$(echo $accession_numbers | grep -oE '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
         third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
         assembly=$(echo "$line" | awk '{print $2}') # Extracts the second column
+        
+        # Check whether this genome has already been downloaded, unzipped, and processed
+        processed_genome="${genomes_dir}/${accession}_${assembly}_genomic_acc.fna"
+        if [[ -f "${genomes_dir}/${processed_genome}" ]]; then
+            echo "Genome ${accession}_${assembly} is already prepared. Skipping..."
+            continue
+        fi
         full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
         echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
         echo "$full_url" >> "${urls_file}"
     done < "$table"
 done
 
-# Create a new directory for the genomes that will be downloaded
-genomes_dir="${project_dir}/genomes"
-mkdir -p "${genomes_dir}"
 cd "${genomes_dir}"
 
 # Download the genomes into the newly created directory
 # Requires internet access!
-echo "Attempting to download the genomes"
+echo "Attempting to download genomes"
 
-if ! parallel -j 8 \
+if [[ ! -s "${urls_file}" ]]; then
+    echo "All requested genomes have already been downloaded and prepared."
+    echo "Nothing to download."
+    exit 0
+fi
+
+# Download genomes
+if ! parallel -j 4 \
     --joblog "${out_dir}/wget.log" \
     wget -nc :::: "${urls_file}"
 then
     echo "Warning: One or more downloads failed."
     echo "See ${out_dir}/wget.log for details."
 fi
-
 echo "Finished downloading genomes"
