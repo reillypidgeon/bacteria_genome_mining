@@ -41,7 +41,7 @@ metadata_dir="${script_dir}/metadata"
 metadata_file="${metadata_dir}/bac120_metadata_r232_acc.tsv"
 
 # Create the output directory for the tables filtered according to user-defined taxa
-out_dir="${project_dir}/results/pyrodigal_out"
+out_dir="${project_dir}/results/accessions_out"
 mkdir -p "${out_dir}"
 
 # Define a function that will merge chunked accession tables
