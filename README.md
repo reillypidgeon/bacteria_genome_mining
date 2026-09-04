@@ -43,44 +43,48 @@ On a HPC cluster like those from the Digital Research Alliance of Canada, module
 
 ```
 # Loading modules
-module load python
-module load scipy-stack
-module load mmseqs2
+module load python scipy-stack mmseqs2
 
-# In the slurm_scripts directory, the 04_pyrodigal_annotations.slurm script creates a virtual environment and installs pyrodigal using requirements in analysis_scripts/pyrodigal_requirements.txt
+# In the slurm_scripts directory, the 04_pyrodigal_annotations.slurm script creates a virtual environment and installs pyrodigal using requirements in slurm_scripts/pyrodigal_requirements.txt
 module load python
 
 virtualenv --no-download "${SLURM_TMPDIR}/pyrodigal_env"
 source "${SLURM_TMPDIR}/pyrodigal_env/bin/activate"
 
 pip install --no-index --upgrade pip
-pip install --no-index -r "${project_dir}/analysis_scripts/pyrodigal_requirements.txt"
+pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.txt"
 ```
 
 ## Usage
 ### Genome FASTA Preparation and Downloading
-The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be downloaded from the NCBI. To ensure that contigs from each genome (.fna) can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
+The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be used to create URLs to download genome FASTA files from the NCBI. To ensure that contigs from each genome can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
 <br>
-The following are usage examples:
-```
-# To create the table of accessions and assemblies for genomes belonging to a user-defined taxonomic level
-# Optional SLURM script
+The following are usage examples: <br>
 
+**01_genome_extraction**
+```
+# Create table(s) of accessions and assemblies for genomes belonging to one or more user-defined taxa
 bash 01_genome_extraction.sh "g__Enterocloster"
 bash 01_genome_extraction.sh "g__Enterocloster" "s__Hungatella hathewayi"
-sbatch 01_genome_extraction.slurm "g__Enterocloster"
 
-# To download the genomes from the created table
-# IMPORTANT: Requires internet access
-
-bash 02_genome_download.sh "metadata/genomes_g__Enterocloster_r232.tsv"
-bash 02_genome_download.sh "metadata/genomes_*_r232.tsv"
-
-# To unzip genomes and add accessions to FASTA headers
 # Optional SLURM script
+sbatch 01_genome_extraction.slurm "g__Enterocloster"
+sbatch 01_genome_extraction.slurm "g__Enterocloster" "s__Hungatella hathewayi"
+```
+**02_genome_download**
+```
+# Download the genomes from the created table(s)
+# IMPORTANT: Requires internet access
+bash 02_genome_download.sh "../results/accessions_out/genomes_g__Enterocloster_r232.tsv"
+bash 02_genome_download.sh "../results/accessions_out/genomes_*_r232.tsv"
+```
+**03_genome_preparation**
+```
+# Unzip genomes and add accessions to FASTA headers for all FASTA files (.fna) in the genomes directory
+bash 03_genome_preparation.sh "../genomes/"
 
-bash 03_genome_preparation.sh "../genomes"
-sbatch 03_genome_preparation.slurm "../genomes"
+# Optional SLURM script
+sbatch 03_genome_preparation.slurm "../genomes/"
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
@@ -88,17 +92,23 @@ sbatch 03_genome_preparation.slurm "../genomes"
 
 ### Protein Prediction and Searching
 Since not all accessions and assemblies will have available protein FASTA files (.faa), it is preferable to generate a catalogue of protein sequences from each genome. The protein catalogue for each genome can then be searched against user-provided protein sequences (for each genome). <br>
+**04_pyrodigal_annotations**
 ```
-# To annotate genomes and predict protein-coding sequences
-# The *acc.fna used here represents FASTA files that have modified headers (added accessions)
+# Annotate genomes and predict protein-coding sequences
+bash 04_pyrodigal_annotations.sh ../genomes/*.fna
 
-bash 04_pyrodigal_annotations.sh ../genomes/*acc.fna
-sbatch 04_pyrodigal_annotations.slurm ../genomes/*acc.fna
+# Optional SLURM script
+sbatch 04_pyrodigal_annotations.slurm ../genomes/*.fna
+```
+**05_mmseqs2_search***
+```
+# Search a user-defined FASTA file of queries against proteins predicted from genomes
+bash 05_mmseqs2_search.sh ../queries.faa ../results/pyrodigal_out/*.faa
+bash 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
 
-# To search a user-defined FASTA file of queries against proteins predicted from genomes
-
-bash 05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
-sbatch 05_mmseqs2_search.slurm ../results/queries.faa ../results/pyrodigal_out/*.faa
+# Optional SLURM script
+sbatch 05_mmseqs2_search.slurm ../queries.faa ../results/pyrodigal_out/*.faa
+sbatch 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
