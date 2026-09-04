@@ -67,12 +67,11 @@ while [[ "$#" -gt 0 ]]; do
             shift 2
             ;;
         -g|--gene)
-            subject_fastas="${results_dir}/pyrodigal_out/*.fna"
+            subject_fastas="${results_dir}/pyrodigal_out"/*.fna
             shift
             ;;
         -p|--protein)
             # Noting changes for the subject_fasta variable
-            subject_fastas="${results_dir}/pyrodigal_out/*.faa"
             shift
             ;;
         -h|--help)
@@ -125,4 +124,4 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"/*.fna
 
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min-coverage "${min_coverage}" "${query_fasta}" "${subject_fastas}"
+bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min-coverage "${min_coverage}" "${query_fasta}" ${subject_fastas}
