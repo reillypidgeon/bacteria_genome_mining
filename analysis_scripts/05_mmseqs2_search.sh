@@ -5,26 +5,98 @@ set -euo pipefail
 echo "Running $0"
 echo "This script searches a query FASTA file against subject FASTA file(s)."
 
+# Set default mmseqs2 parameters for minimum sequence identity and coverage
+min_seq_id=0.5
+min_coverage=0.5
+
+# Set a usage function
+usage() {
+	cat << 'EOF'
+Usage:
+    $0 [options] <query_fasta> <subject_fasta(s)>
+    IMPORTANT: Options must come first if used
+    
+Required arguments:
+    <query_fasta>            Query FASTA file
+    <subject_fasta(s)>       One or more subject FASTA files
+
+Options:
+    -s, --min-seq-id FLOAT   Minimum sequence identity
+                             Default: ${min_seq_id}
+
+    -c, --min-coverage FLOAT     Minimum sequence coverage
+                             Default: ${coverage}
+
+    -h, --help               Display this help message
+
+Examples:
+    $0 ../results/queries.faa ../genomes/*.faa
+
+    $0 --min-seq-id 0.7 ../results/queries.faa ../genomes/*.faa
+
+    $0 --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../genomes/*.faa
+EOF
+}
+
+# Parse the command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -s|--min-seq-id)
+            min_seq_id="$2"
+            shift 2
+            ;;
+        -c|--coverage)
+            min_coverage="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            echo
+            usage
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 if [ "$#" -lt 2 ]; then
-    echo "Error: Invalid number of arguments."
-    echo "Required: FASTA files of the query and subject(s)"
-    echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
-    echo "Example: $0 queries.faa proteins/*.faa"
+    echo "Error: A query FASTA file and at least one subject FASTA file(s) are required"
+    echo
+    usage
     exit 1
 fi
 
-#========================================================================
-# WANT TO ADD OPTIONAL FLAGS HERE THAT WILL REPLACE DEFAULT VALUES
-# sequence id
-# coverage
-#========================================================================
-
-# Assign command line argument for the query
+# Assign command line positional argument for the query (after all options have been assigned)
 query_fasta="$1"
+shift
+
+# Assign all remaining positional arguments as the subject(s)
+subject_fastas=("$@")
 
 # Check if the query file exists
 if [[ ! -f "${query_fasta}" ]]; then
     echo "Error: Query FASTA file not found"
+    exit 1
+fi
+
+# Check that the optional parameters make sense (between 0-1)
+if ! [[ "${min_seq_id}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --min-seq-id must be a number between 0 and 1."
+    exit 1
+fi
+
+if ! [[ "${min_coverage}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --coverage must be a number between 0 and 1."
     exit 1
 fi
 
@@ -53,6 +125,9 @@ fi
 # Print the parameters for this job
 echo "==============================="
 echo "Query FASTA: ${query_fasta}"
+echo "Subject FASTA(s): ${subject_fastas}"
+echo "Minimum sequence identity: ${min_seq_id}"
+echo "Minimum sequence coverage: ${min_coverage}"
 echo "Output directory: ${out_dir}"
 echo "Temporary directory: ${tmp_dir}"
 echo "Threads: ${threads}"
@@ -63,13 +138,13 @@ echo "==============================="
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
 
 # Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
-for subject_fasta in "${@:2}"; do
+for subject_fasta in "${subject_fastas[@]}"; do
     # Check that the subject file exists
     if [[ ! -f "${subject_fasta}" ]]; then
         echo "Error: ${subject_fasta} file not found"
         exit 1
     fi
-	# Extract the fasta identity
+	# Extract the FASTA identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
         fasta_id=$(basename "${subject_fasta}" .fasta)
     elif [[ "${subject_fasta}" == *.faa ]]; then
@@ -90,7 +165,7 @@ for subject_fasta in "${@:2}"; do
     
     echo "Searching ${fasta_id} using mmseqs2"
     
-    # Run the search (auto-detects the input fasta formats)
+    # Run the search (auto-detects the input FASTA formats)
     mmseqs easy-search \
         "${query_fasta}" \
         "${subject_fasta}" \
@@ -98,8 +173,8 @@ for subject_fasta in "${@:2}"; do
         "${tmp_dir}" \
         --threads "$threads" \
         --format-output "${out_format}" \
-        --min-seq-id 0.5 \
-        -c 0.5
+        --min-seq-id "${min_seq_id}" \
+        -c "${min_coverage}"
 done
 
 date
