@@ -78,6 +78,12 @@ for taxon in "$@"; do
         echo "Example: 's__Enterocloster bolteae'"
         exit 1
     fi
+    # Check if genus is confused with species
+    if [[ "$taxon" =~ ^g__[[:space:]] ]]; then
+        echo "A genus level cannot contain a space"
+        echo "Verify whether this is a genus or a species"
+        exit 1
+    fi
 done
 echo "Taxa are valid... Continuing with the workflow"
 
