@@ -117,12 +117,12 @@ source ${project_dir}/bgm_env/bin/activate
 pip install -r ${project_dir}/requirements.txt
 
 # Call the download and analysis scripts
-bash ${download_scripts_dir}/01_genome_extraction.sh ${taxa}
+bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh ${results_dir}/accessions_out/genomes_*_r232.tsv
+bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out"/genomes_*_r232.tsv
 
-bash ${download_scripts_dir}/03_genome_preparation.sh ${genomes_dir}
+bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
-bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh ${genomes_dir}/*.fna
+bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"/*.fna
 
-bash ${analysis_scripts_dir}/05_mmsequs2_search.sh --min-seq-id ${min_seq_id} --min_coverage ${min_coverage} ${query_fasta} ${subject_fastas}
+bash ${analysis_scripts_dir}/05_mmsequs2_search.sh --min-seq-id "${min_seq_id}" --min_coverage "${min_coverage}" "${query_fasta}" "${subject_fastas[@]}"
