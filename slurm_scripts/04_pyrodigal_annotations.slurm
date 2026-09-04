@@ -50,7 +50,7 @@ source "${SLURM_TMPDIR}/pyrodigal_env/bin/activate"
 
 # Install pyrodigal from locally available packages
 pip install --no-index --upgrade pip
-pip install --no-index -r "${project_dir}/analysis_scripts/pyrodigal_requirements.txt"
+pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.txt"
 
 # Check installation
 echo "Python: $(which python)"
