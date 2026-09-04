@@ -79,7 +79,7 @@ for taxon in "$@"; do
         exit 1
     fi
     # Check if genus is confused with species
-    if [[ "$taxon" =~ ^g__[[:space:]] ]]; then
+    if [[ "$taxon" =~ ^g__[a-zA-z0-9].*[[:space:]] ]]; then
         echo "A genus level cannot contain a space"
         echo "Verify whether this is a genus or a species"
         exit 1
