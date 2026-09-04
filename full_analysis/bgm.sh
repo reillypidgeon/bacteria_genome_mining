@@ -19,7 +19,7 @@ results_dir="${project_dir}/results"
 # Set default parameters
 min_seq_id=0.5
 min_coverage=0.5
-subject_fastas="${results_dir}/pyrodigal_out/*.faa"
+subject_fastas="${results_dir}/pyrodigal_out"/*.faa
 
 # Set a usage function
 usage() {
@@ -125,4 +125,4 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"/*.fna
 
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min-coverage "${min_coverage}" "${query_fasta}" "${subject_fastas[@]}"
+bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min-coverage "${min_coverage}" "${query_fasta}" "${subject_fastas}"
