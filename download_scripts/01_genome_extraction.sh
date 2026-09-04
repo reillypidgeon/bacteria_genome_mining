@@ -91,4 +91,4 @@ for taxon in "$@"; do
 done
 
 echo "Finished extracting genome accessions and assemblies"
-echo "Can now download genomes relating to $taxon using the 02_genome_download.sh script"
+echo "Can now download genomes relating to "$@" using the 02_genome_download.sh script"
