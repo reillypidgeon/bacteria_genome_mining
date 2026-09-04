@@ -9,6 +9,14 @@
 
 set -euo pipefail
 
+if [ "$#" -lt 1 ]; then
+	echo "Error: Invalid number of arguments."
+	echo "Required: Nucleic acid FASTA file(s)"
+	echo "Usage: $0 <fasta_fna file(s)>"
+	echo "Example: bash $0 ../genomes/*.fna"
+	exit 1
+fi
+
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
 
@@ -50,6 +58,6 @@ echo "Pyrodigal: $(which pyrodigal)"
 pyrodigal --version
 
 # Run pyrodigal
-bash "${project_dir}/analysis_scripts/04_pyrodigal_annotations.sh" "${project_dir}"/genomes/*acc.fna
+bash "${project_dir}/analysis_scripts/04_pyrodigal_annotations.sh" "$@"
 
 echo "Finished predicting proteins for all given genomes"
