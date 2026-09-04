@@ -24,4 +24,7 @@ for file in *.fna; do
     name="${file%.fna}"
     accession=$(echo $name | grep -Eo "^GC[A,F]_[[:digit:]]{9}\.[1-9]")
     sed "s/^>/>${accession}-/" "$file" > "${name}_acc.fna"
+
+    # Delete the original file without added accessions in the FASTA headers
+    rm "$file"
 done
