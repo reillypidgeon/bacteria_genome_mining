@@ -3,10 +3,12 @@
 import pandas as pd
 import os
 
+# Set variables from 01_genome_extraction.sh script
 taxon_string = os.environ.get('taxon')
 metadata_dir = os.environ.get('metadata_dir')
 output_dir = os.environ.get('out_dir')
 
+# Search metadata table and produce a genome accession table for the taxon
 print(f"Searching the metadata table for: {taxon_string}")
 df = pd.read_csv(f"{metadata_dir}/bac120_metadata_r232_acc.tsv", sep='\t')
 df_taxon = df[df['gtdb_taxonomy'].str.contains(taxon_string, case=False, na=False, regex=False)]
