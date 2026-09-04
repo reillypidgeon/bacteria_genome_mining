@@ -108,7 +108,7 @@ bash 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../
 
 # Optional SLURM script
 sbatch 05_mmseqs2_search.slurm ../queries.faa ../results/pyrodigal_out/*.faa
-sbatch 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
+sbatch 05_mmseqs2_search.slurm --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
