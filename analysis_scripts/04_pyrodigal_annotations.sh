@@ -36,6 +36,7 @@ threads="${SLURM_CPUS_PER_TASK:-1}"
 if ! command -v pyrodigal >/dev/null 2>&1; then
     echo "Error: pyrodigal was not found."
     echo "Please activate an environment containing pyrodigal."
+	echo "Installation instructions can be found here: https://github.com/althonos/pyrodigal"
     exit 1
 fi
 
