@@ -40,6 +40,10 @@ project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 metadata_file="${metadata_dir}/bac120_metadata_r232_acc.tsv"
 
+# Create the output directory for the tables filtered according to user-defined taxa
+out_dir="${project_dir}/results/pyrodigal_out"
+mkdir -p "${out_dir}"
+
 # Define a function that will merge chunked accession tables
 merge_chunked_tables() {
 table_dir="$1"
@@ -78,8 +82,9 @@ done
 echo "Taxa are valid... Continuing with the workflow"
 
 export metadata_dir
+export out_dir
 
-# Loop through the user-defined taxa and create genome accession and assembly tables in the metadata directory
+# Loop through the user-defined taxa and create genome accession and assembly tables in the results directory
 for taxon in "$@"; do
     export taxon
     "$python_cmd" "${script_dir}/extract_taxa.py"
