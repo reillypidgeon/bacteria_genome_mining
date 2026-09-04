@@ -60,10 +60,10 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 This tool can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps)
 To run the tool on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
 ```
-bash bgm.sh queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
+bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 
 # Optional flags can be added to change default parameters for the mmseqs2 search (flags must come before the query FASTA file and taxa of interest)
-bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --gene queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
+bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 ```
 
 ### Genome FASTA Preparation & Downloading
