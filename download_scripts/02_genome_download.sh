@@ -22,11 +22,12 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
 metadata_dir="${script_dir}/metadata"
 
-# Create the metadata directory in case it was deleted from the repository clone
-mkdir -p "${metadata_dir}"
+# Create the output directory for the urls
+out_dir="${project_dir}/results/accessions_out"
+mkdir -p "${out_dir}"
 
 # Create an empty text file that will be populated with links to the FTP download site of the NCBI
-urls_file="${metadata_dir}/urls.txt"
+urls_file="${out_dir}/urls.txt"
 > "${urls_file}"
 
 # Loop through user input
@@ -64,11 +65,11 @@ cd "${genomes_dir}"
 echo "Attempting to download the genomes"
 
 if ! parallel -j 8 \
-    --joblog "${metadata_dir}/wget.log" \
+    --joblog "${out_dir}/wget.log" \
     wget -nc :::: "${urls_file}"
 then
     echo "Warning: One or more downloads failed."
-    echo "See ${metadata_dir}/wget.log for details."
+    echo "See ${out_dir}/wget.log for details."
 fi
 
 echo "Finished downloading genomes"
