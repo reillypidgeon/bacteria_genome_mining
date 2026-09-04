@@ -9,22 +9,83 @@
 
 set -euo pipefail
 
+# Set default mmseqs2 parameters for minimum sequence identity and coverage
+min_seq_id=0.5
+min_coverage=0.5
+
+# Set a usage function
+usage() {
+	cat << 'EOF'
+Usage:
+    $0 [options] <query_fasta> <subject_fasta(s)>
+    IMPORTANT: Options must come first if used
+    
+Required arguments:
+    <query_fasta>            Query FASTA file
+    <subject_fasta(s)>       One or more subject FASTA files
+
+Options:
+    -s, --min-seq-id FLOAT   Minimum sequence identity
+                             Default: ${min_seq_id}
+
+    -c, --min-coverage FLOAT Minimum sequence coverage
+                             Default: ${min_coverage}
+
+    -h, --help               Display this help message
+
+Examples:
+    $0 ../results/queries.faa ../genomes/*.faa
+
+    $0 --min-seq-id 0.7 ../results/queries.faa ../genomes/*.faa
+
+    $0 --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../genomes/*.faa
+EOF
+}
+
+# Parse the command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -s|--min-seq-id)
+            min_seq_id="$2"
+            shift 2
+            ;;
+        -c|--coverage)
+            min_coverage="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            echo "Error: Unknown option: $1"
+            echo
+            usage
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 if [ "$#" -lt 2 ]; then
-    echo "Error: Invalid number of arguments."
-    echo "Required: FASTA files of the query and subject(s)"
-    echo "Usage: $0 <query_fasta> <subject_fasta(s)>"
-    echo "Example: $0 queries.faa proteins/*.faa"
+    echo "Error: A query FASTA file and at least one subject FASTA file(s) are required"
+    echo
+    usage
     exit 1
 fi
 
-# Assign command line argument for the query
+# Assign command line positional argument for the query (after all options have been assigned)
 query_fasta="$1"
+shift
 
-# Check if the query file exists
-if [[ ! -f "${query_fasta}" ]]; then
-	echo "Error: Query FASTA file not found"
-	exit 1
-fi
+# Assign all remaining positional arguments as the subject(s)
+subject_fastas=("$@")
 
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
@@ -55,6 +116,6 @@ module load python mmseqs2 scipy-stack
 echo "Python: $(which python)"
 
 # Run mmseqs2
-bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" "${query_fasta}" "${@:2}"
+bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" --min-seq-id ${min_seq_id} --min-coverage ${min_coverage} "${query_fasta}" "${subject_fastas}"
 
 echo "Finished predicting proteins for all given genomes"
