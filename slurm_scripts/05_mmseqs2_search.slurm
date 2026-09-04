@@ -49,7 +49,7 @@ while [[ "$#" -gt 0 ]]; do
             min_seq_id="$2"
             shift 2
             ;;
-        -c|--coverage)
+        -c|--min-coverage)
             min_coverage="$2"
             shift 2
             ;;
