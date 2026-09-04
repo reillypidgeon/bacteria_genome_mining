@@ -24,8 +24,8 @@ Options:
     -s, --min-seq-id FLOAT   Minimum sequence identity
                              Default: ${min_seq_id}
 
-    -c, --min-coverage FLOAT     Minimum sequence coverage
-                             Default: ${coverage}
+    -c, --min-coverage FLOAT Minimum sequence coverage
+                             Default: ${min_coverage}
 
     -h, --help               Display this help message
 
