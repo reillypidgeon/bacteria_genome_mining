@@ -7,7 +7,7 @@ Useful for looking at the taxonomic distribution of genes (or proteins) and stra
 
 > [!IMPORTANT]
 > - Many of the scripts in this repository are formatted to run as SLURM (scheduled) jobs and are found in the ```slurm_scripts``` directory
-> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so cannot be run in an interactive or scheduled job <br>
+> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so cannot be run in an interactive or scheduled job that has restricted internet access (e.g., in clusters like Narval)<br>
 > - This repository is a work in progress - there may be bugs!
 
 ## Approach
