@@ -62,9 +62,12 @@ To run the analysis on a local machine or in an interactive SLURM job (with inte
 ```
 bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 
-# Optional flags can be added to change default parameters for the mmseqs2 search (flags must come before the query FASTA file and taxa of interest)
+# Optional flags can be added to change default parameters for the mmseqs easy-search (flags must come before the query FASTA file and taxa of interest)
 bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 ```
+>[!NOTE]
+> The default parameters for the ```mmseqs easy-search``` are ```--min-seq-id 0.5 --min-coverage 0.5```<br>
+> By default, the search is performed against protein annotations (```--protein``` flag); however this could be changed by adding the ```--gene```flag before the query FASTA file <br>
 
 ### Genome FASTA Preparation & Downloading
 The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be used to create URLs to download genome FASTA files from the NCBI. To ensure that contigs from each genome can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
