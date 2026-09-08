@@ -1,20 +1,20 @@
 # Bacteria Genome Mining (BGM)
 
 ## Purpose
-To find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
+Find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
 <br>
 Useful for looking at the taxonomic distribution of genes (or proteins) and strain-level variation within species.
 
 > [!IMPORTANT]
 > - Many of the scripts in this repository are formatted to run as SLURM (scheduled) jobs and are found in the ```slurm_scripts``` directory
-> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so cannot be run in an interactive or scheduled job that has restricted internet access (e.g., in clusters like Narval)<br>
+> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so they cannot be run in an interactive or scheduled job that has restricted internet access (e.g., in Compute Canada clusters like Narval)<br>
 > - This repository is a work in progress - there may be bugs!
 
 ## Approach
-- Download genome fasta files (.fna) from the NCBI using GTDB (release 232) taxonomy based on user input
-- Annotate fasta files and predict protein-coding sequences using [pyrodigal](https://github.com/althonos/pyrodigal)
+- Download genome FASTA files (.fna) from the NCBI using GTDB (release 232) taxonomy based on user input
+- Annotate FASTA files and predict protein-coding sequences using [pyrodigal](https://github.com/althonos/pyrodigal)
 - Search for homologous sequences in the newly-created protein catalogues using [mmseqs2](https://github.com/soedinglab/MMseqs2)
-- Output tab-separated tables of all hits and best-hits for a given protein within a genome
+- Output tab-separated tables of all hits and best hits for a given protein within a genome
 
 ## Dependencies
 The following tools and packages need to be installed for the scripts in this repository to work
@@ -57,8 +57,8 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 
 ## Usage
 ### Full Analysis
-This tool can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps). <br>
-To run the tool on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
+This analysis can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps). <br>
+To run the analysis on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
 ```
 bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 
@@ -110,7 +110,7 @@ bash 04_pyrodigal_annotations.sh ../genomes/*.fna
 # Optional SLURM script
 sbatch 04_pyrodigal_annotations.slurm ../genomes/*.fna
 ```
-**05_mmseqs2_search***
+**05_mmseqs2_search**
 ```
 # Search a user-defined FASTA file of queries against proteins predicted from genomes
 bash 05_mmseqs2_search.sh ../queries.faa ../results/pyrodigal_out/*.faa
