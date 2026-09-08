@@ -39,13 +39,15 @@ pip install -r requirements.txt
 # Then run the scripts as shown in the Usage section below
 ```
 <br>
-On a HPC cluster like those from the Digital Research Alliance of Canada, modules need to first be loaded. These steps are already included in the slurm-ready scripts in the slurm_scripts directory. <br>
+On a HPC cluster like those from the Digital Research Alliance of Canada, you must first load the modules. <br>
+These steps are already included in the slurm-ready scripts in the slurm_scripts directory. <br>
 
 ```
 # Loading modules
 module load python scipy-stack mmseqs2
 
-# In the slurm_scripts directory, the 04_pyrodigal_annotations.slurm script creates a virtual environment and installs pyrodigal using requirements in slurm_scripts/pyrodigal_requirements.txt
+# In the slurm_scripts directory, the 04_pyrodigal_annotations.slurm script creates a virtual environment
+# Then installs pyrodigal using requirements in slurm_scripts/pyrodigal_requirements.txt
 module load python
 
 virtualenv --no-download "${SLURM_TMPDIR}/pyrodigal_env"
@@ -62,12 +64,17 @@ To run the analysis on a local machine or in an interactive SLURM job (with inte
 ```
 bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 
-# Optional flags can be added to change default parameters for the mmseqs easy-search (flags must come before the query FASTA file and taxa of interest)
+# Optional flags can be added to change default parameters for the mmseqs easy-search
+# Flags must come before the query FASTA file and taxa of interest
 bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 ```
 >[!NOTE]
 > The default parameters for the ```mmseqs easy-search``` are ```--min-seq-id 0.5 --min-coverage 0.5```<br>
-> By default, the search is performed against protein annotations (```--protein``` flag); however this could be changed by adding the ```--gene```flag before the query FASTA file <br>
+> By default, the search is performed against protein annotations (```--protein``` flag); however, this could be changed by adding the ```--gene``` flag before the query FASTA file <br>
+
+### Examples
+The ```examples``` directory contains a queries.faa file and a [short tutorial](examples/README.md) on how to run the full analysis using the script in the ```full_analysis``` directory. <br>
+There is also example output in ```examples/results``` that can be used as a reference for your own tests.
 
 ### Genome FASTA Preparation & Downloading
 The first step is to extract the genomes of one or more user-defined taxonomic levels from the GTDB release 232 metadata table. The extracted genome accession and assembly codes can then be used to create URLs to download genome FASTA files from the NCBI. To ensure that contigs from each genome can easily be traced back to a single accession, the accession for each genome is added to FASTA headers. <br>
