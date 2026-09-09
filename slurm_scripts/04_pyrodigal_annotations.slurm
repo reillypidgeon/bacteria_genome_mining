@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-if [ "$#" -lt 1 ]; then
+if [[ "$#" -lt 1 ]]; then
 	echo "Error: Invalid number of arguments."
 	echo "Required: Nucleic acid FASTA file(s)"
 	echo "Usage: $0 <fasta_fna file(s)>"
