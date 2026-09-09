@@ -73,7 +73,7 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-if [ "$#" -lt 2 ]; then
+if [[ "$#" -lt 2 ]]; then
     echo "Error: A query FASTA file and at least one subject FASTA file(s) are required"
     echo
     usage
