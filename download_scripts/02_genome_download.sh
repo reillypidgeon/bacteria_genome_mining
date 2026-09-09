@@ -12,8 +12,8 @@ if [[ "$#" -lt 1 ]]; then
     echo "Error: Invalid number of arguments."
     echo "Required: One or more tab-separated file(s) containing a column with NCBI accession and a column with the NCBI assembly."
     echo "Usage: $0 <accessions_filename.tsv>"
-    echo "Example: $0 metadata/genomes_g__Enterocloster_r232.tsv"
-    echo "Example: $0 metadata/genomes_*_r232.tsv"
+    echo "Example: $0 ../results/accessions_out/genomes_g__Enterocloster_r232.tsv"
+    echo "Example: $0 ../results/accessions_out/genomes_*_r232.tsv"
     exit 1
 fi
 
