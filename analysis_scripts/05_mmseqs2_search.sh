@@ -13,7 +13,7 @@ min_coverage=0.5
 usage() {
 	cat << 'EOF'
 Usage:
-    $0 [options] <query_fasta> <subject_fasta(s)>
+    05_mmseqs2_search.sh [options] <query_fasta> <subject_fasta(s)>
     IMPORTANT: Options must come first if used
     
 Required arguments:
@@ -30,11 +30,9 @@ Options:
     -h, --help               Display this help message
 
 Examples:
-    $0 ../results/queries.faa ../genomes/*.faa
-
-    $0 --min-seq-id 0.7 ../results/queries.faa ../genomes/*.faa
-
-    $0 --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../genomes/*.faa
+    05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
+    05_mmseqs2_search.sh --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
+    05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
 EOF
 }
 
