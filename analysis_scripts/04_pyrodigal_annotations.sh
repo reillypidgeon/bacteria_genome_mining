@@ -4,13 +4,28 @@ set -euo pipefail
 
 echo "Running $0"
 echo "This script predicts proteins from one or more nucleotide FASTA files using pyrodigal."
+echo "The input can either be one or more specific FASTA file(s) or a directory containing FASTA files."
 
 if [ "$#" -lt 1 ]; then
 	echo "Error: Invalid number of arguments."
 	echo "Required: Nucleic acid FASTA file(s)"
 	echo "Usage: $0 <fasta_fna file(s)>"
+	echo "Usage: $0 <fasta_fna directory>"
 	echo "Example: bash $0 ../genomes/*.fna"
+	echo "Example: bash $0 ../genomes/"
 	exit 1
+fi
+
+if [ "$#" -eq 1 ]; then
+	echo "Single argument detected."
+	if [ -d "$@" ]; then
+		echo "The argument is a directory"
+	elif [ -f "$@" ]; then
+		echo "The argument is a file"
+	else
+		echo "Error: Argument is invalid"
+		exit 1
+	fi
 fi
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
