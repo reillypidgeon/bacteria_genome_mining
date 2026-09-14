@@ -9,11 +9,37 @@
 
 set -euo pipefail
 
-if [[ "$#" -lt 1 ]]; then
+if [ "$#" -lt 1 ]; then
 	echo "Error: Invalid number of arguments."
 	echo "Required: Nucleic acid FASTA file(s)"
 	echo "Usage: $0 <fasta_fna file(s)>"
+	echo "Usage: $0 <fasta_fna directory>"
 	echo "Example: bash $0 ../genomes/*.fna"
+	echo "Example: bash $0 ../genomes/"
+	exit 1
+fi
+
+# Detect the type of argument provided and assign to the fastas variable
+if [ "$#" -eq 1 ]; then
+	echo "Single argument detected."
+	if [ -d "$@" ]; then
+		echo "The argument is a directory"
+		clean_dir="${@%/}" #Removes any forward slashes
+		fastas="${clean_dir}/*.fna"
+		echo "Will loop through ${clean_dir}/*.fna"
+	elif [ -f "$@" ]; then
+		echo "The argument is a file"
+		fastas="$@"
+		echo "Will run on the single file: $fastas"
+	else
+		echo "Error: Argument is invalid"
+		exit 1
+	fi
+elif [ "$#" -gt 1 ]; then
+	echo "More than one argument detected"
+	fastas="$@"
+else
+	echo "Error with input"
 	exit 1
 fi
 
@@ -58,6 +84,6 @@ echo "Pyrodigal: $(which pyrodigal)"
 pyrodigal --version
 
 # Run pyrodigal
-bash "${project_dir}/analysis_scripts/04_pyrodigal_annotations.sh" "$@"
+bash "${project_dir}/analysis_scripts/04_pyrodigal_annotations.sh" "$fastas"
 
 echo "Finished predicting proteins for all given genomes"
