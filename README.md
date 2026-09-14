@@ -115,10 +115,13 @@ Since not all accessions and assemblies will have available protein FASTA files 
 **04_pyrodigal_annotations**
 ```
 # Annotate genomes and predict protein-coding sequences
+# Provide either the FASTA files as input or the directory that contains these FASTA (.fna) files
 bash 04_pyrodigal_annotations.sh ../genomes/*.fna
+bash 04_pyrodigal_annotations.sh ../genomes/
 
 # Optional SLURM script
 sbatch 04_pyrodigal_annotations.slurm ../genomes/*.fna
+sbatch 04_pyrodigal_annotations.slurm ../genomes/
 ```
 **05_mmseqs2_search**
 ```
