@@ -9,6 +9,9 @@ echo "This script searches a query FASTA file against subject FASTA file(s)."
 min_seq_id=0.5
 min_coverage=0.5
 
+# Set default search type (protein)
+search="protein"
+
 # Set a usage function
 usage() {
 	cat << 'EOF'
@@ -18,7 +21,7 @@ Usage:
     
 Required arguments:
     <query_fasta>            Query FASTA file
-    <subject_fasta(s)>       One or more subject FASTA files
+    <subject_fasta(s) or directory>       One or more subject FASTA files or a directory containing protein fasta files (.faa)
 
 Options:
     -s, --min-seq-id FLOAT   Minimum sequence identity
@@ -26,6 +29,11 @@ Options:
 
     -c, --min-coverage FLOAT Minimum sequence coverage
                              Default: ${min_coverage}
+
+	-g, --gene               Search FASTA against genes (.fna)
+
+	-p, --protein            Search FASTA against proteins (.faa)
+                             Default
 
     -h, --help               Display this help message
 
@@ -46,6 +54,14 @@ while [[ "$#" -gt 0 ]]; do
         -c|--min-coverage)
             min_coverage="$2"
             shift 2
+            ;;
+		-g|--gene)
+            search="gene"
+            shift
+            ;;
+        -p|--protein)
+            search="protein"
+            shift
             ;;
         -h|--help)
             usage
@@ -79,7 +95,35 @@ query_fasta="$1"
 shift
 
 # Assign all remaining positional arguments as the subject(s)
-subject_fastas=("$@")
+# Detect the type of argument provided and assign to the subject_fastas variable
+if [ "$#" -eq 1 ]; then
+	echo "Single subject_fasta(s) argument detected."
+	if [ -d "$@" ]; then
+		echo "The argument is a directory"
+		clean_dir="${@%/}" #Removes any forward slashes
+		if [ "$search" = "gene" ]; then
+			subject_fastas="${clean_dir}/*.fna"
+			echo "Will loop through ${clean_dir}/*.fna"
+		elif [ "$search" = "protein" ]; then
+			subject_fastas="${clean_dir}/*.faa"
+			echo "Will loop through ${clean_dir}/*.faa"
+			echo "This is the default option"
+		fi
+	elif [ -f "$@" ]; then
+		echo "The argument is a file"
+		subject_fastas="$@"
+		echo "Will run on the single file: ${subject_fastas}"
+	else
+		echo "Error: Argument is invalid"
+		exit 1
+	fi
+elif [ "$#" -gt 1 ]; then
+	echo "More than one argument detected"
+	subject_fastas="$@"
+else
+	echo "Error with input"
+	exit 1
+fi
 
 # Check if the query file exists
 if [[ ! -f "${query_fasta}" ]]; then
@@ -135,7 +179,7 @@ echo "==============================="
 # Assign the output format
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
 
-# Loop through the subject FASTA files (starting at position 2 all the way to the end of the positional arguments)
+# Loop through the subject FASTA files
 for subject_fasta in "${subject_fastas[@]}"; do
     # Check that the subject file exists
     if [[ ! -f "${subject_fasta}" ]]; then
