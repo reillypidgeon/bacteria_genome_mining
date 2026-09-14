@@ -16,16 +16,28 @@ if [ "$#" -lt 1 ]; then
 	exit 1
 fi
 
+# Detect the type of argument provided and assign to the fastas variable
 if [ "$#" -eq 1 ]; then
 	echo "Single argument detected."
 	if [ -d "$@" ]; then
 		echo "The argument is a directory"
+		clean_dir="${@%/}" #Removes any forward slashes
+		fastas="${clean_dir}/*.fna"
+		echo "Will loop through ${clean_dir}/*.fna"
 	elif [ -f "$@" ]; then
 		echo "The argument is a file"
+		fastas="$@"
+		echo "Will run on the single file: $fastas"
 	else
 		echo "Error: Argument is invalid"
 		exit 1
 	fi
+elif [ "$#" -gt 1 ]; then
+	echo "More than one argument detected"
+	fastas="$@"
+else
+	echo "Error with input"
+	exit 1
 fi
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
@@ -37,7 +49,7 @@ out_dir="${project_dir}/results/pyrodigal_out"
 mkdir -p "${out_dir}"
 
 # Check that all input files exist
-for fasta_file in "$@"; do
+for fasta_file in $fastas; do
     if [[ ! -f "${fasta_file}" ]]; then
         echo "Error: Input FASTA file(s) not found"
         exit 1
@@ -60,7 +72,7 @@ echo "Threads: ${threads}"
 echo "Output directory: ${out_dir}"
 
 # Loop through the file(s)
-for fasta_file in "$@"; do
+for fasta_file in $fastas; do
 	echo "Annotating ${fasta_file}"
 	
 	# Remove the trailing file extension and extract the fasta identity
