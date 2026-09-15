@@ -234,7 +234,7 @@ echo "==============================="
 out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
 
 # Loop through the subject FASTA files
-for subject_fasta in "${subject_fastas}"; do
+for subject_fasta in ${subject_fastas}; do
     # Check that the subject file exists
     if [[ ! -f "${subject_fasta}" ]]; then
         echo "Error: ${subject_fasta} file not found"
