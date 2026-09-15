@@ -177,10 +177,10 @@ if [ "$#" -eq 1 ]; then
 		clean_dir="${@%/}" #Removes any forward slashes
 		if [ "$search_against" = "gene" ]; then
 			subject_fastas="${clean_dir}/*.fna"
-			echo "Will loop through ${clean_dir}/*.fna"
+			echo "Will loop through ${clean_dir}/"*.fna
 		elif [ "$search_against" = "protein" ]; then
 			subject_fastas="${clean_dir}/*.faa"
-			echo "Will loop through ${clean_dir}/*.faa"
+			echo "Will loop through ${clean_dir}/"*.faa
 			echo "This is the default option"
 		fi
 	elif [ -f "$@" ]; then
