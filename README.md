@@ -3,11 +3,11 @@
 ## Purpose
 Find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
 <br>
-Useful for looking at the taxonomic distribution of genes (or proteins) and strain-level variation within species.
+Useful for looking at the taxonomic distribution of genes or proteins and strain-level variation within species.
 
 > [!IMPORTANT]
 > - Many of the scripts in this repository are formatted to run as SLURM (scheduled) jobs and are found in the ```slurm_scripts``` directory
-> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so they cannot be run in an interactive or scheduled job that has restricted internet access (e.g., in Compute Canada clusters like Narval)<br>
+> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so they cannot be run in an interactive or scheduled job that has restricted internet access (e.g. in Compute Canada clusters like Narval)<br>
 > - This repository is a work in progress - there may be bugs!
 
 ## Approach
@@ -58,6 +58,19 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 ```
 
 ## Usage
+### User-Defined Input
+Most of the analysis requires minimal user input (unless you're running scripts separately). The user absolutely needs to provide 2 inputs:
+- A FASTA file of sequences of interest, e.g. `my_favourite_proteins.faa` or `my_favourite_genes.fna`
+- At least one GTDB-formatted taxon of interest, e.g. `"f__Lachnospiraceae"` or `"s__Enterocloster bolteae"` (make sure to quote the taxon for species due to the space)
+
+Optional inputs relate to the mmseqs2 search, which include the following flags:
+- `--min-seq-id`: Minimum sequence identity cutoff (FLOAT between 0-1 | Default: `0.5`)
+- `--min-coverage`: Minimum sequence coverage cutoff (FLOAT between 0-1 | Default: `0.5`)
+- `--search-type`: mmseqs2 search type (INT between 0-4 | Default: `0` (automatic) for protein queries and `3` for nucleotide queries). 
+- `--search-against`: The type of pyrodigal output to search against when using directories as inputs for mmseqs2 (STRING equal to either `protein` or `gene` | Default: `protein`)
+>[!IMPORTANT]
+> These optional flags must be placed **before** the query FASTA file in the `full_analysis/bgm.sh`, `analysis_scripts/05_mmseqs2_search.sh`, and `slurm_scripts/05_mmseqs2_search.slurm`
+
 ### Full Analysis
 This analysis can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps). <br>
 To run the analysis on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
