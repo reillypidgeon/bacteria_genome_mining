@@ -36,6 +36,7 @@ urls_file="${out_dir}/urls.txt"
 
 # Loop through user input
 for table in "$@"; do
+    echo "Processing $table"
     # Check if table exists
     if [[ ! -f "$table" ]]; then
         echo "Error: $table file not found"
@@ -43,28 +44,37 @@ for table in "$@"; do
     fi
     
     # Go line-by-line and build up URLs for each genome of interest
-    while IFS= read -r line
-    do
+    while IFS= read -r line; do
         base_url="https://ftp.ncbi.nlm.nih.gov/genomes/all"
         gb_rs=$(echo $line | grep -o "GC[AF]")
         accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+")
         accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
         first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
-        second_three=$(echo $accession_numbers | grep -oE '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
+        second_three=$(echo $accession_numbers | grep -Eo '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
         third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
         assembly=$(echo "$line" | awk '{print $2}') # Extracts the second column
         
-        # Check whether this genome has already been downloaded, unzipped, and processed
-        processed_genome="${genomes_dir}/${accession}_${assembly}_genomic_acc.fna"
-        if [[ -f "${genomes_dir}/${processed_genome}" ]]; then
-            echo "Genome ${accession}_${assembly} is already prepared. Skipping..."
-            continue
-        fi
         full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
         echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
         echo "$full_url" >> "${urls_file}"
     done < "$table"
 done
+
+# Remove urls that have already been downloaded and processed
+urls_file_to_download="${out_dir}/urls_to_download.txt"
+> "${urls_file_to_download}"
+
+while IFS= read -r line; do
+    file_prefix=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+[^ ]*[^\.fna\.gz]")
+    processed_genome="${genomes_dir}/${file_prefix}_acc.fna"
+    
+    if [[ -f "${genomes_dir}/${processed_genome}" ]]; then
+        echo "Genome ${file_prefix} has already been processed. Skipping..."
+        continue
+    else
+        echo "$line" > "${urls_file_to_download}"
+    fi
+done < "${urls_file}"
 
 cd "${genomes_dir}"
 
@@ -72,7 +82,7 @@ cd "${genomes_dir}"
 # Requires internet access!
 echo "Attempting to download genomes"
 
-if [[ ! -s "${urls_file}" ]]; then
+if [[ ! -s "${urls_file_to_download}" ]]; then
     echo "Nothing to download."
     exit 0
 fi
@@ -80,7 +90,7 @@ fi
 # Download genomes
 if ! parallel -j 4 \
     --joblog "${out_dir}/wget.log" \
-    wget -nc :::: "${urls_file}"
+    wget -nc :::: "${urls_file_to_download}"
 then
     echo "Warning: One or more downloads failed."
     echo "See ${out_dir}/wget.log for details."
