@@ -20,9 +20,9 @@ Useful for looking at the taxonomic distribution of genes (or proteins) and stra
 The following tools and packages need to be installed for the scripts in this repository to work
 - Python3
 - [GNU parallel](https://doi.org/10.5281/zenodo.7958356)
-- [pandas](https://github.com/pandas-dev/pandas): Install by running `pip -m install pandas` (unless it's available via the scipy-stack in your cluster)
-- [scipy](https://github.com/scipy/scipy): Install by running `pip -m install scipy` (unless it's available via the scipy-stack in your cluster)
-- [pyrodigal](https://github.com/althonos/pyrodigal): Install by running `pip -m install pyrodigal`
+- [pandas](https://github.com/pandas-dev/pandas): Install by running `pip install pandas` (unless it's available via the scipy-stack in your cluster)
+- [scipy](https://github.com/scipy/scipy): Install by running `pip install scipy` (unless it's available via the scipy-stack in your cluster)
+- [pyrodigal](https://github.com/althonos/pyrodigal): Install by running `pip install pyrodigal`
 - [mmseqs2](https://github.com/soedinglab/MMseqs2): Install by following instructions on the mmseqs2 GitHub page (multiple options)
 
 <br>
