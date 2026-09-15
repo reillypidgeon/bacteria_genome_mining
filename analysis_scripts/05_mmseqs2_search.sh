@@ -240,6 +240,8 @@ for subject_fasta in "${subject_fastas[@]}"; do
         echo "Error: ${subject_fasta} file not found"
         exit 1
     fi
+	# Check that the subject file is not empty
+	
 	# Extract the FASTA identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
         fasta_id=$(basename "${subject_fasta}" .fasta)
