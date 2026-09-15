@@ -31,30 +31,29 @@ usage() {
 Usage:
     bgm.sh [options] <query_fasta> <taxon_string(s)>
     IMPORTANT: Options must come first (if used), followed by a single query FASTA file, then by one or more taxa
-    
+
 Required arguments:
     <query_fasta>            Query FASTA file (nucleotide or protein)
     <taxon_string(s)>        One or more partial strings according to GTDB taxonomy
 
 Options:
     Options:
-    -i, --min-seq-id 	 FLOAT   	Minimum sequence identity
-                             		Default: ${min_seq_id}
+    -i, --min-seq-id     FLOAT          Minimum sequence identity
+                                        Default: ${min_seq_id}
 
-    -c, --min-coverage 	 FLOAT 		Minimum sequence coverage
-                             		Default: ${min_coverage}
+    -c, --min-coverage   FLOAT          Minimum sequence coverage
+                                        Default: ${min_coverage}
 
-	--search-type		 INT		Search type used by mmseqs2
-									Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
-									Default: 0 (automatic)
-									
-	
-	-s, --search-against STRING     Search query FASTA against 'gene' or 'protein' FASTA files
-							 		Useful when providing a subject_fasta(s) directory
-									Options: gene or protein
-							 		Default: protein
+    --search-type        INT            Search type used by mmseqs2
+                                        Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
+                                        Default: 0 (automatic)
 
-	-h, --help               		Display this help message
+    -s, --search-against STRING         Search query FASTA against 'gene' or 'protein' FASTA files
+                                        Useful when providing a subject_fasta(s) directory
+                                        Options: gene or protein
+                                        Default: protein
+
+    -h, --help                          Display this help message
 
 Examples:
     bgm.sh ../queries.faa "g__Enterocloster"
@@ -63,7 +62,7 @@ Examples:
 
     bgm.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
 
-	bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
+    bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
 EOF
 }
 
