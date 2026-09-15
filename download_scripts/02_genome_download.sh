@@ -65,7 +65,7 @@ urls_file_to_download="${out_dir}/urls_to_download.txt"
 > "${urls_file_to_download}"
 
 while IFS= read -r line; do
-    file_prefix=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+[^ ]*[^\.fna\.gz]")
+    file_prefix=$(basename $line .fna.gz )
     processed_genome="${genomes_dir}/${file_prefix}_acc.fna"
     
     if [[ -f "${processed_genome}" ]]; then
