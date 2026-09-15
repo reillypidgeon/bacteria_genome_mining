@@ -148,6 +148,6 @@ bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
 	--min-coverage "${min_coverage}" \
 	--search-type ${search_type} \
-	--search_against ${search_against} \
+	--search-against ${search_against} \
 	"${query_fasta}" \
 	${subject_fastas}
