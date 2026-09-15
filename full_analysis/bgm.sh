@@ -150,4 +150,4 @@ bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
 	--search-type ${search_type} \
 	--search-against ${search_against} \
 	"${query_fasta}" \
-	"${subject_fastas[@]}"
+	"${subject_fastas}"
