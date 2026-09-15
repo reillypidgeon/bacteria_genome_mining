@@ -19,7 +19,7 @@ for file in *; do
     # Skip files that have already been processed
     [[ "$file" == *_acc.fna ]] && continue
 
-    if [[ "$file" == *.fna.gz ]]; do
+    if [[ "$file" == *.fna.gz ]]; then
         echo "Unzipping $file"
         gunzip *.fna.gz
     fi
