@@ -25,7 +25,7 @@ Usage:
     
 Required arguments:
     <query_fasta>                   Query FASTA file
-    <subject_fasta(s) or directory> One or more subject FASTA files or a directory containing FASTA files
+    <subject_fasta(s) or directory> One or more subject FASTA files or a single directory containing FASTA files
 
 Options:
     -i, --min-seq-id FLOAT   		Minimum sequence identity
