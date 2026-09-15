@@ -40,7 +40,7 @@ pip install -r requirements.txt
 ```
 <br>
 On a HPC cluster like those from the Digital Research Alliance of Canada, you must first load the modules. <br>
-These steps are already included in the slurm-ready scripts in the slurm_scripts directory. <br>
+These steps are already included in the slurm-ready scripts in the slurm_scripts directory; however, modules will need to be loaded in interactive jobs beforehand. <br>
 
 ```
 # Loading modules
@@ -62,15 +62,18 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 This analysis can be run by calling a single script or by calling individual scripts (see Genome FASTA Preparation & Downloading and Protein Prediction & Searching sections below for individual steps). <br>
 To run the analysis on a local machine or in an interactive SLURM job (with internet access), you can call the following script (located in the full_analysis directory): <br>
 ```
-bash bgm.sh ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
-
-# Optional flags can be added to change default parameters for the mmseqs easy-search
-# Flags must come before the query FASTA file and taxa of interest
-bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
+bash bgm.sh ../queries.faa "g__Enterocloster" "s__Hungatella hathewayi"
+```
+Optional flags can be added to change default parameters for the mmseqs easy-search
+```
+# Flags must come before the query FASTA file and taxa of interest!
+bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 ```
 >[!NOTE]
-> The default parameters for the ```mmseqs easy-search``` are ```--min-seq-id 0.5 --min-coverage 0.5```<br>
-> By default, the search is performed against protein annotations (```--protein``` flag); however, this could be changed by adding the ```--gene``` flag before the query FASTA file <br>
+> The default parameters for the `mmseqs easy-search` are `--min-seq-id 0.5 --min-coverage 0.5 --search-type 0`<br>
+> Search types (for mmseqs2) are defined as follows: `0` (automatic), `1` (amino acid), `2` (translated), `3` (nucleotide), `4` (translated nucleotide alignment)
+> In both analysis scripts (pyrodigal and mmseqs2), directories containing FASTA files can be specified instead of actual files
+> When specifying a directory, the `mmseqs easy-search` search is performed against pyrodigal protein annotations (`--search-against protein` flag); however, this could be changed by using the `--search-against gene` flag <br>
 
 ### Examples
 The ```examples``` directory contains a queries.faa file and a [short tutorial](examples/README.md) on how to run the full analysis using the script in the ```full_analysis``` directory. <br>
@@ -127,11 +130,11 @@ sbatch 04_pyrodigal_annotations.slurm ../genomes/
 ```
 # Search a user-defined FASTA file of queries against proteins predicted from genomes
 bash 05_mmseqs2_search.sh ../queries.faa ../results/pyrodigal_out/*.faa
-bash 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
+bash 05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out
 
 # Optional SLURM script
 sbatch 05_mmseqs2_search.slurm ../queries.faa ../results/pyrodigal_out/*.faa
-sbatch 05_mmseqs2_search.slurm --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out/*.faa
+sbatch 05_mmseqs2_search.slurm --min-seq-id 0.7 --min-coverage 0.8 ../queries.faa ../results/pyrodigal_out
 ```
 > [!NOTE]
 > - Scripts in the ```slurm_scripts``` directory may need to be modified based on the number of genomes
