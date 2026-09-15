@@ -240,7 +240,10 @@ for subject_fasta in ${subject_fastas}; do
         exit 1
     fi
 	# Check that the subject file is not empty
-	
+	if [[ -z "${subject_fasta}" ]]; then
+		echo "${subject_fasta} file is empty. Skipping..."
+		continue
+	fi
 	# Extract the FASTA identity
     if [[ "${subject_fasta}" == *.fasta ]]; then
         fasta_id=$(basename "${subject_fasta}" .fasta)
