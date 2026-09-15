@@ -176,7 +176,7 @@ if [ "$#" -eq 1 ]; then
 		echo "The argument is a directory"
 		clean_dir="${@%/}" #Removes any forward slashes
 		if [ "$search_against" = "gene" ]; then
-			subject_fastas="${clean_dir}/*".fna
+			subject_fastas="${clean_dir}/"*.fna
 			echo "Will loop through ${clean_dir}/"*.fna
 		elif [ "$search_against" = "protein" ]; then
 			subject_fastas="${clean_dir}/"*.faa
