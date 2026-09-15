@@ -139,7 +139,7 @@ pip install -r ${project_dir}/requirements.txt
 # Call the download and analysis scripts
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out/genomes_*_r232.tsv"
+bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out/"genomes_*_r232.tsv
 
 bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
