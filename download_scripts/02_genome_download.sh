@@ -67,13 +67,15 @@ urls_file_to_download="${out_dir}/urls_to_download.txt"
 while IFS= read -r line; do
     file_prefix=$(basename $line .fna.gz )
     processed_genome="${genomes_dir}/${file_prefix}_acc.fna"
+    echo ${file_prefix}
     
     if [[ -f "${processed_genome}" ]]; then
         echo "Genome ${file_prefix} has already been processed. Skipping..."
         continue
     else
-        echo "$line" > "${urls_file_to_download}"
+        echo "Adding ${file_prefix} to the list of URLs"
     fi
+    echo "$line" > "${urls_file_to_download}"
 done < "${urls_file}"
 
 cd "${genomes_dir}"
