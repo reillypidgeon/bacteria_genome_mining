@@ -9,11 +9,17 @@
 
 set -euo pipefail
 
+echo "Running $0"
+echo "This script searches a query FASTA file against subject FASTA file(s)."
+
 # Set default mmseqs2 parameters for minimum sequence identity and coverage
 min_seq_id=0.5
 min_coverage=0.5
 
-# Set default search type (protein)
+# Set default mmseqs2 search_type variable
+search_type=0
+
+# Set default search_against variable (in case a directory is provided)
 search_against="protein"
 
 # Set a usage function
@@ -28,12 +34,17 @@ Required arguments:
     <subject_fasta(s) or directory> One or more subject FASTA files or a single directory containing FASTA files
 
 Options:
-    -i, --min-seq-id FLOAT   		Minimum sequence identity
+    -i, --min-seq-id 	 FLOAT   	Minimum sequence identity
                              		Default: ${min_seq_id}
 
-    -c, --min-coverage FLOAT 		Minimum sequence coverage
+    -c, --min-coverage 	 FLOAT 		Minimum sequence coverage
                              		Default: ${min_coverage}
 
+	--search-type		 INT		Search type used by mmseqs2
+									Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
+									Default: 0 (automatic)
+									
+	
 	-s, --search-against STRING     Search query FASTA against 'gene' or 'protein' FASTA files
 							 		Useful when providing a subject_fasta(s) directory
 									Options: gene or protein
@@ -61,13 +72,17 @@ while [[ "$#" -gt 0 ]]; do
             min_coverage="$2"
             shift 2
             ;;
+		--search-type)
+			search_type="$2"
+			shift 2
+			;;
 		-s|--search-against)
 			if [[ "$2" =~ "gene" ]]; then
 				search_against="gene"
 			elif [[ "$2" =~ "protein" ]]; then
 				search_against="protein" # Already default
 			else
-				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files
+				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files"
 				echo
 				usage
 				exit 1
@@ -105,6 +120,54 @@ fi
 query_fasta="$1"
 shift
 
+# Check if the query file exists
+if [[ ! -f "${query_fasta}" ]]; then
+    echo "Error: Query FASTA file not found"
+    exit 1
+fi
+
+# Check that the optional parameters make sense
+# Search type
+if ! [[ "${search_type}" =~ ^([04])$ ]]; then
+    echo "Error: --search-type must be an integer between 0 and 4"
+	echo "Value entered: ${search_type}"
+	echo "From mmseqs2 documentation: 0: auto 1: amino acid, 2: translated, 3: nucleotide, 4: translated nucleotide alignment"
+    exit 1
+fi
+# Sequence identity
+if ! [[ "${min_seq_id}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --min-seq-id must be a number between 0 and 1"
+	echo "Value entered: ${min_seq_id}"
+    exit 1
+fi
+# Sequence coverage
+if ! [[ "${min_coverage}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --coverage must be a number between 0 and 1"
+	echo "Value entered: ${min_coverage}"
+    exit 1
+fi
+
+# Check if the query fasta is a nucleotide or protein file and assign a default search type if not specified by the user
+
+# Extract sequence lines, remove whitespace, and convert to uppercase.
+query_sequences=$(awk '!/^>/ { gsub(/[[:space:]]/, ""); print }' "${query_fasta}" | tr '[:lower:]' '[:upper:]')
+if [[ -z "${query_sequences}" ]]; then
+    echo "ERROR: No sequences found in ${query_fasta}"
+    exit 1
+fi
+
+# Check for characters outside the nucleotide alphabet
+if echo "${query_sequences}" | grep -q '[^ACGTURYSWKMBDHVN-]'; then
+    echo "Protein query FASTA detected"
+else
+    echo "Nucleotide query FASTA detected"
+	# Set the search type if not already defined by the user (default value: 0)
+	if [[ ${search_type} -eq 0 ]]; then
+		echo "Setting the search type to 3 (nucleotide)" # This prevents errors when searching nt vs. nt
+		search_type=3
+	fi
+fi
+
 # Assign all remaining positional arguments as the subject(s)
 # Detect the type of argument provided and assign to the subject_fastas variable
 if [ "$#" -eq 1 ]; then
@@ -138,23 +201,6 @@ else
 	exit 1
 fi
 
-# Check if the query file exists
-if [[ ! -f "${query_fasta}" ]]; then
-    echo "Error: Query FASTA file not found"
-    exit 1
-fi
-
-# Check that the optional parameters make sense (between 0-1)
-if ! [[ "${min_seq_id}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
-    echo "Error: --min-seq-id must be a number between 0 and 1."
-    exit 1
-fi
-
-if ! [[ "${min_coverage}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
-    echo "Error: --coverage must be a number between 0 and 1."
-    exit 1
-fi
-
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
 
@@ -184,6 +230,6 @@ module load python mmseqs2 scipy-stack
 echo "Python: $(which python)"
 
 # Run mmseqs2
-bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" --min-seq-id ${min_seq_id} --min-coverage ${min_coverage} --search-against ${search_against} ${query_fasta} ${subject_fastas}
+bash "${project_dir}/analysis_scripts/05_mmseqs2_search.sh" --min-seq-id ${min_seq_id} --min-coverage ${min_coverage} --search-type ${search_type} --search-against ${search_against} ${query_fasta} ${subject_fastas}
 
 echo "Finished predicting proteins for all given genomes"
