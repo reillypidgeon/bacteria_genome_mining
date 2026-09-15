@@ -10,44 +10,46 @@ min_seq_id=0.5
 min_coverage=0.5
 
 # Set default search type (protein)
-search="protein"
+search_against="protein"
 
 # Set a usage function
 usage() {
 	cat << 'EOF'
 Usage:
     05_mmseqs2_search.sh [options] <query_fasta> <subject_fasta(s)>
-    IMPORTANT: Options must come first if used
+    IMPORTANT: Options must come first if used!
     
 Required arguments:
-    <query_fasta>            Query FASTA file
-    <subject_fasta(s) or directory>       One or more subject FASTA files or a directory containing protein fasta files (.faa)
+    <query_fasta>                   Query FASTA file
+    <subject_fasta(s) or directory> One or more subject FASTA files or a directory containing FASTA files
 
 Options:
-    -s, --min-seq-id FLOAT   Minimum sequence identity
-                             Default: ${min_seq_id}
+    -i, --min-seq-id FLOAT   		Minimum sequence identity
+                             		Default: ${min_seq_id}
 
-    -c, --min-coverage FLOAT Minimum sequence coverage
-                             Default: ${min_coverage}
+    -c, --min-coverage FLOAT 		Minimum sequence coverage
+                             		Default: ${min_coverage}
 
-	-g, --gene               Search FASTA against genes (.fna)
+	-s, --search-against STRING     Search query FASTA against 'gene' or 'protein' FASTA files
+							 		Useful when providing a subject_fasta(s) directory
+									Options: gene or protein
+							 		Default: protein
 
-	-p, --protein            Search FASTA against proteins (.faa)
-                             Default
-
-    -h, --help               Display this help message
+	-h, --help               		Display this help message
 
 Examples:
     05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
+	05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/
+	05_mmseqs2_search.sh --search-against gene ../results/queries.faa ../results/pyrodigal_out/
 EOF
 }
 
 # Parse the command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        -s|--min-seq-id)
+        -i|--min-seq-id)
             min_seq_id="$2"
             shift 2
             ;;
@@ -55,14 +57,19 @@ while [[ "$#" -gt 0 ]]; do
             min_coverage="$2"
             shift 2
             ;;
-		-g|--gene)
-            search="gene"
-            shift
-            ;;
-        -p|--protein)
-            search="protein"
-            shift
-            ;;
+		-s|--search-against)
+			if [[ "$2" =~ "gene" ]]; then
+				search_against="gene"
+			elif [[ "$2" =~ "protein" ]]; then
+				search_against="protein" # Already default
+			else
+				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files
+				echo
+				usage
+				exit 1
+			fi
+			shift 2
+			;;
         -h|--help)
             usage
             exit 0
@@ -101,10 +108,10 @@ if [ "$#" -eq 1 ]; then
 	if [ -d "$@" ]; then
 		echo "The argument is a directory"
 		clean_dir="${@%/}" #Removes any forward slashes
-		if [ "$search" = "gene" ]; then
+		if [ "$search_against" = "gene" ]; then
 			subject_fastas="${clean_dir}/*.fna"
 			echo "Will loop through ${clean_dir}/*.fna"
-		elif [ "$search" = "protein" ]; then
+		elif [ "$search_against" = "protein" ]; then
 			subject_fastas="${clean_dir}/*.faa"
 			echo "Will loop through ${clean_dir}/*.faa"
 			echo "This is the default option"
@@ -122,6 +129,8 @@ elif [ "$#" -gt 1 ]; then
 	subject_fastas="$@"
 else
 	echo "Error with input"
+	echo
+	usage
 	exit 1
 fi
 
@@ -168,6 +177,7 @@ fi
 echo "==============================="
 echo "Query FASTA: ${query_fasta}"
 echo "Subject FASTA(s): ${subject_fastas}"
+echo "Search against" ${search_against}"
 echo "Minimum sequence identity: ${min_seq_id}"
 echo "Minimum sequence coverage: ${min_coverage}"
 echo "Output directory: ${out_dir}"
