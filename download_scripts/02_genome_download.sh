@@ -68,7 +68,7 @@ while IFS= read -r line; do
     file_prefix=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+[^ ]*[^\.fna\.gz]")
     processed_genome="${genomes_dir}/${file_prefix}_acc.fna"
     
-    if [[ -f "${genomes_dir}/${processed_genome}" ]]; then
+    if [[ -f "${processed_genome}" ]]; then
         echo "Genome ${file_prefix} has already been processed. Skipping..."
         continue
     else
