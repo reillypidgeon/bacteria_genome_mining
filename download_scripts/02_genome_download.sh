@@ -75,7 +75,7 @@ while IFS= read -r line; do
     else
         echo "Adding ${file_prefix} to the list of URLs"
     fi
-    echo "$line" > "${urls_file_to_download}"
+    echo "$line" >> "${urls_file_to_download}"
 done < "${urls_file}"
 
 cd "${genomes_dir}"
