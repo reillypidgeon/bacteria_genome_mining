@@ -20,12 +20,14 @@ results_dir="${project_dir}/results"
 min_seq_id=0.5
 min_coverage=0.5
 subject_fastas="${results_dir}/pyrodigal_out"/*.faa
+search_type=0
+search_against="protein"
 
 # Set a usage function
 usage() {
 	cat << 'EOF'
 Usage:
-    $0 [options] <query_fasta> <taxon_string(s)>
+    bgm.sh [options] <query_fasta> <taxon_string(s)>
     IMPORTANT: Options must come first (if used), followed by a single query FASTA file, then by as many taxa as you want
     
 Required arguments:
@@ -47,11 +49,11 @@ Options:
     -h, --help               Display this help message
 
 Examples:
-    $0 queries.faa "g__Enterocloster"
+    bgm.sh queries.faa "g__Enterocloster"
 
-    $0 --min-seq-id 0.7 queries.faa "g__Enterocloster" "s__Hungatella hathewayi"
+    bgm.sh --min-seq-id 0.7 queries.faa "g__Enterocloster" "s__Hungatella hathewayi"
 
-    $0 --min-seq-id 0.7 --min-coverage 0.8 queries.fna --gene "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
+    bgm.sh --min-seq-id 0.7 --min-coverage 0.8 queries.fna --gene "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
 EOF
 }
 
@@ -118,10 +120,15 @@ pip install -r ${project_dir}/requirements.txt
 # Call the download and analysis scripts
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out"/genomes_*_r232.tsv
+bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out/genomes_*_r232.tsv"
 
 bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
-bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"/*.fna
+bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" --min-coverage "${min_coverage}" "${query_fasta}" ${subject_fastas}
+bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
+	--min-coverage "${min_coverage}" \
+	--search-type ${search_type} \
+	--search_against ${search_against} \
+	"${query_fasta}" \
+	${subject_fastas}
