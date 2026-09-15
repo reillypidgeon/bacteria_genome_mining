@@ -15,6 +15,14 @@ fi
 # Go to the user-defined directory
 cd "$1"
 
-echo "Unzipping files"
-gunzip *.fna.gz
+for file in *; do
+    # Skip files that have already been processed
+    [[ "$file" == *_acc.fna ]] && continue
+
+    if [[ "$file" == *_.fna.gz ]]; do
+        echo "Unzipping $file"
+        gunzip *.fna.gz
+    fi
+done
+
 echo "Unzipping finished"
