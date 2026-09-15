@@ -75,7 +75,7 @@ while [[ "$#" -gt 0 ]]; do
 			elif [[ "$2" =~ "protein" ]]; then
 				search_against="protein" # Already default
 			else
-				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files
+				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files"
 				echo
 				usage
 				exit 1
@@ -113,6 +113,54 @@ fi
 query_fasta="$1"
 shift
 
+# Check if the query file exists
+if [[ ! -f "${query_fasta}" ]]; then
+    echo "Error: Query FASTA file not found"
+    exit 1
+fi
+
+# Check that the optional parameters make sense
+# Search type
+if ! [[ "${search_type}" =~ ^([04])$ ]]; then
+    echo "Error: --search-type must be an integer between 0 and 4"
+	echo "Value entered: ${search_type}"
+	echo "From mmseqs2 documentation: 0: auto 1: amino acid, 2: translated, 3: nucleotide, 4: translated nucleotide alignment"
+    exit 1
+fi
+# Sequence identity
+if ! [[ "${min_seq_id}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --min-seq-id must be a number between 0 and 1"
+	echo "Value entered: ${min_seq_id}"
+    exit 1
+fi
+# Sequence coverage
+if ! [[ "${min_coverage}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
+    echo "Error: --coverage must be a number between 0 and 1"
+	echo "Value entered: ${min_coverage}"
+    exit 1
+fi
+
+# Check if the query fasta is a nucleotide or protein file and assign a default search type if not specified by the user
+
+# Extract sequence lines, remove whitespace, and convert to uppercase.
+query_sequences=$(awk '!/^>/ { gsub(/[[:space:]]/, ""); print }' "${query_fasta}" | tr '[:lower:]' '[:upper:]')
+if [[ -z "${query_sequences}" ]]; then
+    echo "ERROR: No sequences found in ${query_fasta}"
+    exit 1
+fi
+
+# Check for characters outside the nucleotide alphabet
+if echo "${query_sequences}" | grep -q '[^ACGTURYSWKMBDHVN-]'; then
+    echo "Protein query FASTA detected"
+else
+    echo "Nucleotide query FASTA detected"
+	# Set the search type if not already defined by the user (default value: 0)
+	if [[ ${search_type} -eq 0 ]]; then
+		echo "Setting the search type to 3 (nucleotide)" # This prevents errors when searching nt vs. nt
+		search_type=3
+	fi
+fi
+
 # Assign all remaining positional arguments as the subject(s)
 # Detect the type of argument provided and assign to the subject_fastas variable
 if [ "$#" -eq 1 ]; then
@@ -144,31 +192,6 @@ else
 	echo
 	usage
 	exit 1
-fi
-
-# Check if the query file exists
-if [[ ! -f "${query_fasta}" ]]; then
-    echo "Error: Query FASTA file not found"
-    exit 1
-fi
-
-# Check that the optional parameters make sense
-# Search type
-if ! [[ "${search_type}" =~ ^([04])$ ]]; then
-    echo "Error: --search-type must be an integer between 0 and 4."
-	echo "Value entered: ${search_type}"
-	echo "From mmseqs2 documentation: 0: auto 1: amino acid, 2: translated, 3: nucleotide, 4: translated nucleotide alignment"
-    exit 1
-fi
-# Sequence identity
-if ! [[ "${min_seq_id}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
-    echo "Error: --min-seq-id must be a number between 0 and 1."
-    exit 1
-fi
-# Sequence coverage
-if ! [[ "${min_coverage}" =~ ^([01](\.[0-9]+)?|\.[0-9]+)$ ]]; then
-    echo "Error: --coverage must be a number between 0 and 1."
-    exit 1
 fi
 
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
