@@ -91,10 +91,10 @@ fi
 
 # Download genomes
 if ! parallel -j 4 \
-    --joblog "${out_dir}/wget.log" \
+    --joblog "${out_dir}/wget_log.tsv" \
     wget -nc :::: "${urls_file_to_download}"
 then
     echo "Warning: One or more downloads failed."
-    echo "See ${out_dir}/wget.log for details."
+    echo "See ${out_dir}/wget_log.tsv for details."
 fi
 echo "Finished downloading genomes"
