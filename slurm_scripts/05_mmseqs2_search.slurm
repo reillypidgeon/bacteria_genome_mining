@@ -34,30 +34,29 @@ Required arguments:
     <subject_fasta(s) or directory> One or more subject FASTA files or a single directory containing FASTA files
 
 Options:
-    -i, --min-seq-id 	 FLOAT   	Minimum sequence identity
-                             		Default: ${min_seq_id}
+    -i, --min-seq-id     FLOAT          Minimum sequence identity
+                                        Default: ${min_seq_id}
 
-    -c, --min-coverage 	 FLOAT 		Minimum sequence coverage
-                             		Default: ${min_coverage}
+    -c, --min-coverage   FLOAT          Minimum sequence coverage
+                                        Default: ${min_coverage}
 
-	--search-type		 INT		Search type used by mmseqs2
-									Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
-									Default: 0 (automatic)
-									
-	
-	-s, --search-against STRING     Search query FASTA against 'gene' or 'protein' FASTA files
-							 		Useful when providing a subject_fasta(s) directory
-									Options: gene or protein
-							 		Default: protein
+    --search-type        INT            Search type used by mmseqs2
+                                        Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
+                                        Default: 0 (automatic)
 
-	-h, --help               		Display this help message
+    -s, --search-against STRING         Search query FASTA against 'gene' or 'protein' FASTA files
+                                        Useful when providing a subject_fasta(s) directory
+                                        Options: gene or protein
+                                        Default: protein
+
+    -h, --help                          Display this help message
 
 Examples:
-    05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/*.faa
-    05_mmseqs2_search.sh --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
-    05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
-	05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/
-	05_mmseqs2_search.sh --search-against gene ../results/queries.faa ../results/pyrodigal_out/
+    05_mmseqs2_search.slurm ../results/queries.faa ../results/pyrodigal_out/*.faa
+    05_mmseqs2_search.slurm --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
+    05_mmseqs2_search.slurm --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
+    05_mmseqs2_search.slurm ../results/queries.faa ../results/pyrodigal_out/
+    05_mmseqs2_search.slurm --search-against gene ../results/queries.faa ../results/pyrodigal_out/
 EOF
 }
 
