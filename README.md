@@ -24,9 +24,7 @@ The following tools and packages need to be installed for the scripts in this re
 - [pyrodigal](https://github.com/althonos/pyrodigal): Install by running `pip install pyrodigal`
 - [mmseqs2](https://github.com/soedinglab/MMseqs2): Install by following instructions on the mmseqs2 GitHub page (multiple options)
 
-<br>
 On a local machine, it is best to create a Python virtual environment that has all these dependencies installed and available.
-
 ```
 # In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env (or whatever you want)
 python3 -m venv bgm_env
@@ -37,10 +35,8 @@ pip install -r requirements.txt
 
 # Then run the scripts as shown in the Usage section below
 ```
-<br>
 On a HPC cluster like those from the Digital Research Alliance of Canada, you must first load the modules. <br>
 These steps are already included in the slurm-ready scripts in the slurm_scripts directory; however, modules will need to be loaded in interactive jobs beforehand. <br>
-
 ```
 # Loading modules
 module load python scipy-stack mmseqs2
@@ -55,7 +51,6 @@ source "${SLURM_TMPDIR}/pyrodigal_env/bin/activate"
 pip install --no-index --upgrade pip
 pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.txt"
 ```
-
 ## Usage
 ### User-Defined Input
 Most of the analysis requires minimal user input (unless you're running scripts separately). The user absolutely needs to provide 2 inputs:
