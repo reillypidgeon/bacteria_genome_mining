@@ -7,10 +7,11 @@ Useful for looking at the taxonomic distribution of genes or proteins and strain
 
 > [!IMPORTANT]
 > - Many of the scripts in this repository are formatted to run as SLURM (scheduled) jobs and are found in the ```slurm_scripts``` directory
-> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so they cannot be run in an interactive or scheduled job that has restricted internet access (e.g. in Digital Research Alliance of Canada clusters like Narval)<br>
+> - Some scripts (```download_scripts/02_genome_download.sh```) will require internet access to work, so they cannot be run in an interactive or scheduled job that has restricted internet access (e.g. in some Digital Research Alliance of Canada clusters like Narval)<br>
 
 ## Approach
-- Download genome FASTA files (.fna) from the NCBI using GTDB (release 232) taxonomy based on user input
+- Download genome FASTA files (.fna) from the NCBI using GTDB (release 232) taxonomy based on user input (GTDB taxon)
+  - GTDB format follows the following conventions: `d__Taxon; c__Taxon; o__Taxon; f__Taxon; g__Taxon; s__Taxon` (domain, phylum, class, order, family, genus, species)
 - Annotate FASTA files and predict protein-coding sequences using [pyrodigal](https://github.com/althonos/pyrodigal)
 - Search for homologous sequences in the newly-created protein catalogues using [mmseqs2](https://github.com/soedinglab/MMseqs2)
 - Output tab-separated tables of all hits and best hits for a given protein within a genome
@@ -54,8 +55,10 @@ pip install --no-index -r "${project_dir}/slurm_scripts/pyrodigal_requirements.t
 ## Usage
 ### User-Defined Input
 Most of the analysis requires minimal user input (unless you're running scripts separately). The user absolutely needs to provide 2 inputs:
-- A FASTA file of sequences of interest, e.g. `my_favourite_proteins.faa` or `my_favourite_genes.fna`
-- At least one GTDB-formatted taxon of interest, e.g. `"f__Lachnospiraceae"` or `"s__Enterocloster bolteae"` (make sure to quote the taxon for species due to the space)
+- A FASTA file of sequences of interest
+  - Example: `my_favourite_proteins.faa` or `my_favourite_genes.fna`
+- At least one GTDB-formatted taxon of interest (`d__Taxon; c__Taxon; o__Taxon; f__Taxon; g__Taxon; s__Taxon`)
+  - Example: `"f__Lachnospiraceae"` or `"s__Enterocloster bolteae"` (make sure to quote the taxon for species due to the space)
 
 Optional inputs relate to the mmseqs2 search, which include the following flags:
 - `--min-seq-id`: Minimum sequence identity cutoff (FLOAT between 0-1 | Default: `0.5`)
