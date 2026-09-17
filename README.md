@@ -81,6 +81,10 @@ Optional flags can be added to change default parameters for the mmseqs easy-sea
 # Flags must come before the query FASTA file and taxa of interest!
 bash bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
 ```
+In case you are using a cluster with full internet access, the full analysis can be run using the following SLURM script:
+```
+sbatch bgm.slurm --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi"
+```
 >[!NOTE]
 > The default parameters for the `mmseqs easy-search` are `--min-seq-id 0.5 --min-coverage 0.5 --search-type 0`<br>
 > Search types (for mmseqs2) are defined as follows: `0` (automatic), `1` (amino acid), `2` (translated), `3` (nucleotide), `4` (translated nucleotide alignment)
