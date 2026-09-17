@@ -14,9 +14,27 @@ echo "This script searches a user-defined FASTA file against genomes from bacter
 echo "By default, the user-defined query FASTA file will be searched against a predicted protein database for genomes matching the taxon input string(s) and output hits with sequence identity and coverage values of 0.5"
 echo "These default values can be changed by providing flags with the input"
 
-# Get the path to the current script directory and the project directory (bacteria_genome_mining)
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-project_dir="$(dirname "${script_dir}")"
+# Start from the directory where sbatch was submitted
+search_dir="${SLURM_SUBMIT_DIR}"
+
+# Search upward for the project root
+while [[ "${search_dir}" != "/" ]]; do
+    if [[ -d "${search_dir}/download_scripts" ]] && [[ -d "${search_dir}/analysis_scripts" ]]; then
+        project_dir="${search_dir}"
+        break
+    fi
+    search_dir="$(dirname "${search_dir}")"
+done
+
+# Stop if the project directory could not be found
+if [[ -z "${project_dir:-}" ]]; then
+    echo "Error: Could not locate the bacteria_genome_mining project directory."
+    echo "The job must be submitted from somewhere inside the project."
+    exit 1
+fi
+
+echo "SLURM submission directory: ${SLURM_SUBMIT_DIR}"
+echo "Project directory: ${project_dir}"
 
 # Set the paths to scripts and results
 analysis_scripts_dir="${project_dir}/analysis_scripts"
@@ -135,12 +153,11 @@ shift
 # Assign all remaining positional arguments as the taxa
 taxa=("$@")
 
-# In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env
-python3 -m venv ${project_dir}/bgm_env
-source ${project_dir}/bgm_env/bin/activate
+# Load modules
+module load python mmseqs2 scipy-stack
 
-# Then install all required packages based on the requirements.txt file in the project directory
-pip install -r ${project_dir}/requirements.txt
+# Check installation
+echo "Python: $(which python)"
 
 # Call the download and analysis scripts
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
