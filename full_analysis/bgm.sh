@@ -146,7 +146,8 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
 # Based on the taxa, subset the subject FASTAs for the final mmseqs2 step
-accessions_tables="${accessions_dir}/#ADD HERE"
+accessions_tables="${accessions_dir}/genomes_${taxa[@]}_r232.tsv" #ADD HERE
+echo ${accessions_tables}
 
 # FOR LOOP GOES HERE
 
