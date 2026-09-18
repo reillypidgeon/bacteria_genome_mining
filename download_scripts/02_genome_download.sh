@@ -46,12 +46,12 @@ for table in "$@"; do
     # Go line-by-line and build up URLs for each genome of interest
     while IFS= read -r line; do
         base_url="https://ftp.ncbi.nlm.nih.gov/genomes/all"
-        gb_rs=$(echo $line | grep -o "GC[AF]")
-        accession=$(echo $line | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+")
-        accession_numbers=$(echo $accession | grep -Eo "[[:digit:]]{9}")
-        first_three=$(echo $accession_numbers | grep -Eo "^[0-9]{3}")
-        second_three=$(echo $accession_numbers | grep -Eo '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
-        third_three=$(echo $accession_numbers | grep -Eo "[0-9]{3}$")
+        gb_rs=$(echo "$line" | grep -o "GC[AF]")
+        accession=$(echo "$line" | grep -Eo "GC[AF]_[[:digit:]]{9}\.[[:digit:]]+")
+        accession_numbers=$(echo "$accession" | grep -Eo "[[:digit:]]{9}")
+        first_three=$(echo "$accession_numbers" | grep -Eo "^[0-9]{3}")
+        second_three=$(echo "$accession_numbers" | grep -Eo '[0-9]{9}' | sed -E 's/[0-9]{3}([0-9]{3})[0-9]{3}/\1/')
+        third_three=$(echo "$accession_numbers" | grep -Eo "[0-9]{3}$")
         assembly=$(echo "$line" | awk '{print $2}') # Extracts the second column
         
         full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
@@ -65,7 +65,7 @@ urls_file_to_download="${out_dir}/urls_to_download.txt"
 > "${urls_file_to_download}"
 
 while IFS= read -r line; do
-    file_prefix=$(basename $line .fna.gz )
+    file_prefix=$(basename "$line" .fna.gz )
     unzipped_genome="${genomes_dir}/${file_prefix}.fna"
     processed_genome="${genomes_dir}/${file_prefix}_acc.fna"
     echo ${file_prefix}
