@@ -71,7 +71,7 @@ while IFS= read -r line; do
     echo ${file_prefix}
     
     if [[ -f "${processed_genome}" ]] ||
-        [[ -f "${unzipped_genome}"; then
+        [[ -f "${unzipped_genome}" ]]; then
         echo "Genome ${file_prefix} has already been processed. Skipping..."
         continue
     else
