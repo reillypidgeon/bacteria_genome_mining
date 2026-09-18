@@ -17,11 +17,12 @@ download_scripts_dir="${project_dir}/download_scripts"
 metadata_dir="${download_scripts_dir}/metadata"
 genomes_dir="${project_dir}/genomes"
 results_dir="${project_dir}/results"
+accessions_dir="${results_dir}/accessions_out"
 
 # Set default parameters
 min_seq_id=0.5
 min_coverage=0.5
-subject_fastas="${results_dir}/pyrodigal_out"
+subject_fastas_dir="${results_dir}/pyrodigal_out"
 search_type=0
 search_against="protein"
 
@@ -138,15 +139,20 @@ pip install -r ${project_dir}/requirements.txt
 # Call the download and analysis scripts
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out/"genomes_*_r232.tsv
+bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/"genomes_*_r232.tsv
 
 bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
+
+# Based on the taxa, subset the subject FASTAs for the final mmseqs2 step
+accessions_tables="${accessions_dir}/#ADD HERE"
+
+# FOR LOOP GOES HERE
 
 bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
 	--min-coverage "${min_coverage}" \
 	--search-type ${search_type} \
 	--search-against ${search_against} \
 	"${query_fasta}" \
-	"${subject_fastas}"
+	"${subject_fastas_dir}"
