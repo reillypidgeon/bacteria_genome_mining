@@ -20,7 +20,7 @@ for file in *; do
     [[ "$file" == *.fna ]] && continue
     if [[ "$file" == *.fna.gz ]]; then
         echo "Unzipping $file"
-        gunzip *.fna.gz
+        gunzip "$file"
     fi
 done
 
