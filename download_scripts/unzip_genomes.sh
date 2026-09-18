@@ -17,8 +17,7 @@ cd "$1"
 
 for file in *; do
     # Skip files that have already been processed
-    [[ "$file" == *_acc.fna ]] && continue
-
+    [[ "$file" == *.fna ]] && continue
     if [[ "$file" == *.fna.gz ]]; then
         echo "Unzipping $file"
         gunzip *.fna.gz
