@@ -138,6 +138,13 @@ shift
 # Assign all remaining positional arguments as the taxa
 taxa=("$@")
 
+# Trim spaces from taxa names (in case of species) and replace with underscores
+taxa_underscore=()
+for taxon in "${taxa[@]}"; do
+    taxon_underscore=$(echo $taxon | tr ' ' '_')
+    taxa_underscore+=( "${taxon_underscore}" )
+done
+
 # In the project directory (bacteria_genome_mining), create a virtual environment called bgm_env
 python3 -m venv ${project_dir}/bgm_env
 source ${project_dir}/bgm_env/bin/activate
@@ -146,15 +153,28 @@ source ${project_dir}/bgm_env/bin/activate
 pip install -r ${project_dir}/requirements.txt
 
 # Call the download and analysis scripts
+# Step 01
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/"genomes_*_r232.tsv # Figure out the wildcard here
+# Step 02
+# Create a single urls_file specific to the taxa specified in the command line arguments
+urls_merged="${out_dir}/urls_"$(echo "${taxa[@]}" | tr ' ' '_')".txt"
+> "${urls_merged}"
 
+# Download the genomes and append the urls.txt for each iteration of the loop to the $urls_merged file
+for taxon in "${taxa_underscore}"; do
+    bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/genomes_${taxon}_r232.tsv"
+    echo ${out_dir}/urls.txt >> "${urls_merged}"
+done
+
+# Step 03
 bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
+# Step 04
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
-# Loop through the individual gene or protein annotations based on the urls
+Step 05
+# Loop through the individual gene or protein annotations based on the $urls_merged file
 while IFS= read -r line; do
     file_base=$(basename $line .fna.gz)
     # Build the annotation file name based on the url basename and the search-against flag
@@ -179,4 +199,4 @@ while IFS= read -r line; do
         --search-against ${search_against} \
         "${query_fasta}" \
         "${annotation_file}"
-done < "${urls_file}"
+done < "${urls_merged}"
