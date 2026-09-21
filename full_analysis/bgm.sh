@@ -145,15 +145,18 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
-# Based on the taxa, subset the subject FASTAs for the final mmseqs2 step
-accessions_tables="${accessions_dir}/genomes_${taxa[@]}_r232.tsv" #ADD HERE
-echo ${accessions_tables}
-
-# 
+# Loop through the taxa
 for taxon in "${taxa[@]}"; do
 	echo "Running $taxon"
 	taxon_underscore=$(echo $taxon | tr ' ' '_')
+	echo ${taxon_underscore}
 	accessions_tables="${accessions_dir}/genomes_${taxon_underscore}_r232.tsv"
+	echo ${accessions_tables}
+	
+	while IFS= read -r line; do
+        full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
+        echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
+    done < "${urls_file}"
 done
 
 bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
