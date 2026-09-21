@@ -155,7 +155,7 @@ urls_merged="${accessions_dir}/urls_"$(echo "${taxa[@]}" | tr ' ' '_')".txt" > "
 # Download the genomes and append the urls.txt for each iteration of the loop to the $urls_merged file
 for taxon in "${taxa_underscore}"; do
     bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/genomes_${taxon}_r232.tsv"
-    echo ${accessions_dir}/urls.txt >> "${urls_merged}"
+    cat ${accessions_dir}/urls.txt >> "${urls_merged}"
 done
 
 # Step 03
