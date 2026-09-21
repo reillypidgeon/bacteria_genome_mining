@@ -208,7 +208,7 @@ export out_format
 export out_dir
 export project_dir
 
-"${python_cmd}" "${script_dir}/merge_mmseqs2_tables.py"
+"${python_cmd}" "${analysis_scripts_dir}/merge_mmseqs2_tables.py"
 
 echo "Finished mmseqs pipeline with annotations"
 date
