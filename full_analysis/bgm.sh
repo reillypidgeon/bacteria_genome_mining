@@ -25,6 +25,8 @@ min_coverage=0.5
 subject_fastas_dir="${results_dir}/pyrodigal_out"
 search_type=0
 search_against="protein"
+time_code=$(date +%Y%m%d%H%M)
+out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
 
 # Set a usage function
 usage() {
@@ -39,6 +41,9 @@ Required arguments:
 
 Options:
     Options:
+	-o, --out-dir     	 STRING         Output directory path
+                                        Default: ${out_dir}
+	
     -i, --min-seq-id     FLOAT          Minimum sequence identity
                                         Default: ${min_seq_id}
 
@@ -159,7 +164,9 @@ for taxon in "${taxa[@]}"; do
     done < "${urls_file}"
 done
 
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
+bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" \
+	--min-seq-id "${min_seq_id}" \
+	--out-dir "${out_dir}"
 	--min-coverage "${min_coverage}" \
 	--search-type ${search_type} \
 	--search-against ${search_against} \
