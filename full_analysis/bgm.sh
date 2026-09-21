@@ -182,5 +182,33 @@ while IFS= read -r line; do
         continue
     fi
     # Run the search if all checks are successful
-    bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" --min-seq-id "${min_seq_id}" --out-dir "${out_dir}" --min-coverage "${min_coverage}" --search-type ${search_type} --search-against "${search_against}" "${query_fasta}" "${annotation_file}"
+    bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" --min-seq-id "${min_seq_id}" --out-dir "${out_dir}" --min-coverage "${min_coverage}" --search-type ${search_type} --search-against "${search_against}" --skip-merge "true" "${query_fasta}" "${annotation_file}"
 done < "${urls_merged}"
+
+# Now call the merge_mmseqs2_tables.py script (skipped in step 05)
+# Check that Python is available
+python_cmd="${PYTHON:-python3}"
+
+if ! command -v "${python_cmd}" >/dev/null 2>&1; then
+    echo "Error: Python executable not found: ${python_cmd}"
+    exit 1
+fi
+
+# Check that pandas is available
+if ! "${python_cmd}" -c "import pandas" >/dev/null 2>&1; then
+    echo "Error: Python package 'pandas' is not available."
+    echo "Please activate an environment containing pandas."
+    exit 1
+fi
+
+# Add column headers based on the output format and merge results
+out_format="query,target,pident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qseq,tseq"
+export out_format
+# Already defined above
+export out_dir
+export project_dir
+
+"${python_cmd}" "${script_dir}/merge_mmseqs2_tables.py"
+
+echo "Finished mmseqs pipeline with annotations"
+date
