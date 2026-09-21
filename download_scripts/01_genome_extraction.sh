@@ -7,7 +7,7 @@ echo "This script extracts accession and assembly codes from the GTDB release 23
 
 if [[ "$#" -lt 1 ]]; then
     echo "Error: Invalid number of arguments"
-    echo "Required: A taxon according to GTDB taxonomy"
+    echo "Required: At least one taxon according to GTDB taxonomy"
     echo "Usage: $0 <taxon_string(s)>"
     echo "Example: $0 'g__Enterocloster'"
     echo "Example: $0 'g__Enterocloster' 's__Hungatella hathewayi'"
