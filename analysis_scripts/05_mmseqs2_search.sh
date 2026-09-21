@@ -15,6 +15,9 @@ search_type=0
 # Set default search_against variable (in case a directory is provided)
 search_against="protein"
 
+# Set default skip_merge variable
+skip_merge="false"
+
 # Get the path to the script directory and the project directory (bacteria_genome_mining)
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
@@ -38,10 +41,10 @@ Options:
     -o, --out-dir        STRING         Output directory path
                                         Default: ${out_dir}
 
-    -i, --min-seq-id     FLOAT          Minimum sequence identity
+    -i, --min-seq-id     FLOAT          Minimum sequence identity (0.0-1.0)
                                         Default: ${min_seq_id}
 
-    -c, --min-coverage   FLOAT          Minimum sequence coverage
+    -c, --min-coverage   FLOAT          Minimum sequence coverage (0.0-1.0)
                                         Default: ${min_coverage}
 
     --search-type        INT            Search type used by mmseqs2
@@ -50,9 +53,13 @@ Options:
 
     -s, --search-against STRING         Search query FASTA against 'gene' or 'protein' FASTA files
                                         Useful when providing a subject_fasta(s) directory
-                                        Options: gene or protein
+                                        Options: "gene" or "protein"
                                         Default: protein
 
+    --skip-merge         BOOLEAN        Skip the merging with metadata
+                                        Options: "false" or "true"
+                                        Default: "false"
+                                        
     -h, --help                          Display this help message
 
 Examples:
@@ -60,7 +67,7 @@ Examples:
     05_mmseqs2_search.sh --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/
-    05_mmseqs2_search.sh --search-against gene -o ../results/mmseqs2_out/my_favourite_dir ../results/queries.faa ../results/pyrodigal_out/
+    05_mmseqs2_search.sh --search-against gene -o ../results/mmseqs2_out/my_favourite_dir --skip-merge true ../results/queries.faa ../results/pyrodigal_out/
 EOF
 }
 
@@ -94,6 +101,10 @@ while [[ "$#" -gt 0 ]]; do
 				usage
 				exit 1
 			fi
+			shift 2
+			;;
+        --skip-merge)
+			skip_merge="$2"
 			shift 2
 			;;
         -h|--help)
@@ -294,6 +305,11 @@ echo "mmseqs2 search finished"
 #========================================================================
 # Annotate the results tables and merge into a table of all and best hits
 #========================================================================
+
+if [ "${skip_merge}" == "true" ]; then
+    echo "Skipping the metadata addition and merge steps"
+    exit 0
+fi
 
 # Check that Python is available
 python_cmd="${PYTHON:-python3}"
