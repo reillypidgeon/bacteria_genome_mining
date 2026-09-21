@@ -151,9 +151,9 @@ echo ${accessions_tables}
 
 # 
 for taxon in "${taxa[@]}"; do
-	echo "$taxon"
-	#taxon_underscore=
-	#accessions_tables="${accessions_dir}/genomes_${taxon_underscore}_r232.tsv"
+	echo "Running $taxon"
+	taxon_underscore=$(echo $taxon | tr ' ' '_')
+	accessions_tables="${accessions_dir}/genomes_${taxon_underscore}_r232.tsv"
 done
 
 bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
