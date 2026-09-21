@@ -197,8 +197,9 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_dir="$(dirname "${script_dir}")"
 
-# Create the output directory
-out_dir="${project_dir}/results/mmseqs2_out"
+# Create the output directory with the full date and time as a unique code
+time_code=$(date +%Y%m%d%H%M%S)
+out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
 mkdir -p "${out_dir}"
 
 # Define the temporary directory for mmseqs2
