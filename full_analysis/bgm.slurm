@@ -171,10 +171,4 @@ module load python mmseqs2 scipy-stack
 echo "Python: $(which python)"
 
 # Call the full analysis
-bash "${full_analysis_scripts_dir}/bgm.sh" --out-dir "${out_dir}" \
-    --min-seq-id ${min_seq_id} \
-    --min-coverage ${min_coverage} \
-    --search-type ${search_type} \
-    --search-against ${search_against} \
-    "${query_fasta}" \
-    "${taxa[@]}"
+bash "${full_analysis_scripts_dir}/bgm.sh" --out-dir "${out_dir}" --min-seq-id ${min_seq_id} --min-coverage ${min_coverage} --search-type ${search_type} --search-against ${search_against} "${query_fasta}" "${taxa[@]}"
