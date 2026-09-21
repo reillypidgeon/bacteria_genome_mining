@@ -38,7 +38,7 @@ Options:
     -o, --out-dir        STRING         Output directory path
                                         Default: ${out_dir}
 
-	-i, --min-seq-id     FLOAT          Minimum sequence identity
+    -i, --min-seq-id     FLOAT          Minimum sequence identity
                                         Default: ${min_seq_id}
 
     -c, --min-coverage   FLOAT          Minimum sequence coverage
