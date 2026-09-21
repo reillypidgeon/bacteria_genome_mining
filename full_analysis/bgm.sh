@@ -150,8 +150,7 @@ bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
 # Step 02
 # Create a single urls_file specific to the taxa specified in the command line arguments
-urls_merged="${accessions_dir}/urls_"$(echo "${taxa[@]}" | tr ' ' '_')".txt"
-> "${urls_merged}"
+urls_merged="${accessions_dir}/urls_"$(echo "${taxa[@]}" | tr ' ' '_')".txt" > "${urls_merged}"
 
 # Download the genomes and append the urls.txt for each iteration of the loop to the $urls_merged file
 for taxon in "${taxa_underscore}"; do
