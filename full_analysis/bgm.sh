@@ -77,6 +77,7 @@ while [[ "$#" -gt 0 ]]; do
     case "$1" in
 		-o|--out-dir)
             out_dir="$2"
+			mkdir -p "${out_dir}"
             shift 2
             ;;
         -i|--min-seq-id)
