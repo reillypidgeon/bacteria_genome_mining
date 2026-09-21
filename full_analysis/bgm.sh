@@ -153,7 +153,7 @@ bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 urls_merged="${accessions_dir}/urls_"$(echo "${taxa[@]}" | tr ' ' '_')".txt" > "${urls_merged}"
 
 # Download the genomes and append the urls.txt for each iteration of the loop to the $urls_merged file
-for taxon in "${taxa_underscore}"; do
+for taxon in "${taxa_underscore[@]}"; do
     echo "Downloading genomes for $taxon"
 	bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/genomes_${taxon}_r232.tsv"
     cat ${accessions_dir}/urls.txt >> "${urls_merged}"
