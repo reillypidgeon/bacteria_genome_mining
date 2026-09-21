@@ -182,12 +182,5 @@ while IFS= read -r line; do
         continue
     fi
     # Run the search if all checks are successful
-    bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" \
-        --min-seq-id "${min_seq_id}" \
-        --out-dir "${out_dir}"
-        --min-coverage "${min_coverage}" \
-        --search-type ${search_type} \
-        --search-against ${search_against} \
-        "${query_fasta}" \
-        "${annotation_file}"
+    bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" --min-seq-id "${min_seq_id}" --out-dir "${out_dir}" --min-coverage "${min_coverage}" --search-type ${search_type} --search-against "${search_against}" "${query_fasta}" "${annotation_file}"
 done < "${urls_merged}"
