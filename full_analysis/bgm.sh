@@ -36,38 +36,29 @@ Usage:
     IMPORTANT: Options must come first (if used), followed by a single query FASTA file, then by one or more taxa
 
 Required arguments:
-    <query_fasta>            Query FASTA file (nucleotide or protein)
-    <taxon_string(s)>        One or more partial strings according to GTDB taxonomy
+    <query_fasta>                        Query FASTA file (nucleotide or protein)
+    <taxon_string(s)>                    One or more partial strings according to GTDB taxonomy
 
 Options:
-    Options:
-	-o, --out-dir     	 STRING         Output directory path
-                                        Default: ${out_dir}
-	
-    -i, --min-seq-id     FLOAT          Minimum sequence identity
-                                        Default: ${min_seq_id}
-
-    -c, --min-coverage   FLOAT          Minimum sequence coverage
-                                        Default: ${min_coverage}
-
-    --search-type        INT            Search type used by mmseqs2
-                                        Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
-                                        Default: 0 (automatic)
-
-    -s, --search-against STRING         Search query FASTA against 'gene' or 'protein' FASTA files
-                                        Useful when providing a subject_fasta(s) directory
-                                        Options: gene or protein
-                                        Default: protein
-
-    -h, --help                          Display this help message
+    -o, --out-dir           STRING       Output directory path
+                                         Default: ${out_dir}
+    -i, --min-seq-id        FLOAT        Minimum sequence identity
+                                         Default: ${min_seq_id}
+    -c, --min-coverage      FLOAT        Minimum sequence coverage
+                                         Default: ${min_coverage}
+    --search-type           INT          Search type used by mmseqs2
+                                         Options: 0 (automatic), 1 (amino acid), 2 (translated), 3 (nucleotide), 4 (translated nucleotide alignment)
+                                         Default: 0 (automatic)
+    -s, --search-against    STRING       Search query FASTA against 'gene' or 'protein' FASTA files
+                                         Useful when providing a subject_fasta(s) directory
+                                         Options: gene or protein
+                                         Default: protein
+    -h, --help                           Display this help message
 
 Examples:
     bgm.sh ../queries.faa "g__Enterocloster"
-
     bgm.sh --min-seq-id 0.7 ../queries.faa "g__Enterocloster" "s__Hungatella hathewayi"
-
     bgm.sh --min-seq-id 0.7 --min-coverage 0.8 ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
-
     bgm.sh --min-seq-id 0.7 --min-coverage 0.8 --search-type 3 --search-against gene ../queries.fna "g__Enterocloster" "s__Hungatella hathewayi" "g__Ventricola"
 EOF
 }
@@ -75,9 +66,9 @@ EOF
 # Parse the command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-		-o|--out-dir)
+        -o|--out-dir)
             out_dir="$2"
-			mkdir -p "${out_dir}"
+            mkdir -p "${out_dir}"
             shift 2
             ;;
         -i|--min-seq-id)
@@ -89,22 +80,22 @@ while [[ "$#" -gt 0 ]]; do
             shift 2
             ;;
         --search-type)
-			search_type="$2"
-			shift 2
-			;;
-		-s|--search-against)
-			if [[ "$2" =~ "gene" ]]; then
-				search_against="gene"
-			elif [[ "$2" =~ "protein" ]]; then
-				search_against="protein" # Already default
-			else
-				echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files"
-				echo
-				usage
-				exit 1
-			fi
-			shift 2
-			;;
+            search_type="$2"
+            shift 2
+            ;;
+        -s|--search-against)
+            if [[ "$2" =~ "gene" ]]; then
+                search_against="gene"
+            elif [[ "$2" =~ "protein" ]]; then
+                search_against="protein" # Already default
+            else
+                echo "Error: If using this flag, specify whether you want to search against 'gene' or 'protein' FASTA files"
+                echo
+                usage
+                exit 1
+            fi
+            shift 2
+            ;;
         -h|--help)
             usage
             exit 0
