@@ -3,7 +3,7 @@
 #SBATCH --job-name=bgm
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
-#SBATCH --time=06:00:00
+#SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 
@@ -39,16 +39,20 @@ echo "Project directory: ${project_dir}"
 # Set the paths to scripts and results
 analysis_scripts_dir="${project_dir}/analysis_scripts"
 download_scripts_dir="${project_dir}/download_scripts"
+full_analysis_scripts_dir="${project_dir}/full_analysis"
 metadata_dir="${download_scripts_dir}/metadata"
 genomes_dir="${project_dir}/genomes"
 results_dir="${project_dir}/results"
+accessions_dir="${results_dir}/accessions_out"
 
 # Set default parameters
 min_seq_id=0.5
 min_coverage=0.5
-subject_fastas="${results_dir}/pyrodigal_out"
+subject_fastas_dir="${results_dir}/pyrodigal_out"
 search_type=0
 search_against="protein"
+time_code=$(date +%Y%m%d%H%M)
+out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
 
 # Set a usage function
 usage() {
@@ -63,6 +67,9 @@ Required arguments:
 
 Options:
     Options:
+	-o, --out-dir     	 STRING         Output directory path
+                                        Default: ${out_dir}
+	
     -i, --min-seq-id     FLOAT          Minimum sequence identity
                                         Default: ${min_seq_id}
 
@@ -94,6 +101,10 @@ EOF
 # Parse the command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
+		-o|--out-dir)
+            out_dir="$2"
+            shift 2
+            ;;
         -i|--min-seq-id)
             min_seq_id="$2"
             shift 2
@@ -159,18 +170,11 @@ module load python mmseqs2 scipy-stack
 # Check installation
 echo "Python: $(which python)"
 
-# Call the download and analysis scripts
-bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
-
-bash ${download_scripts_dir}/02_genome_download.sh "${results_dir}/accessions_out/"genomes_*_r232.tsv
-
-bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
-
-bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
-
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
-	--min-coverage "${min_coverage}" \
-	--search-type ${search_type} \
-	--search-against ${search_against} \
-	"${query_fasta}" \
-	"${subject_fastas}"
+# Call the full analysis
+bash "${full_analysis_scripts_dir}/bgm.sh" --out-dir "${out_dir}" \
+    --min-seq-id ${min_seq_id} \
+    --min-coverage ${min_coverage} \
+    --search-type ${search_type} \
+    --search-against ${search_against} \
+    "${query_fasta}" \
+    "${taxa[@]}"
