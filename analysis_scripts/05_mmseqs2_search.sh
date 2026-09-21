@@ -67,7 +67,11 @@ EOF
 # Parse the command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        -i|--min-seq-id)
+        -o|--out-dir)
+            out_dir="$2"
+            shift 2
+            ;;
+		-i|--min-seq-id)
             min_seq_id="$2"
             shift 2
             ;;
