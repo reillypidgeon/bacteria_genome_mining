@@ -15,19 +15,30 @@ search_type=0
 # Set default search_against variable (in case a directory is provided)
 search_against="protein"
 
+# Get the path to the script directory and the project directory (bacteria_genome_mining)
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir="$(dirname "${script_dir}")"
+
+# Set the default output directory path with the full date and time as a unique code (can be overwritten)
+time_code=$(date +%Y%m%d%H%M)
+out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
+
 # Set a usage function
 usage() {
 	cat << 'EOF'
 Usage:
     05_mmseqs2_search.sh [options] <query_fasta> <subject_fasta(s)>
-    IMPORTANT: Options must come first if used!
+    IMPORTANT: Options (flags) must come first if used!
     
 Required arguments:
     <query_fasta>                   Query FASTA file
     <subject_fasta(s) or directory> One or more subject FASTA files or a single directory containing FASTA files
 
 Options:
-    -i, --min-seq-id     FLOAT          Minimum sequence identity
+    -o, --out-dir        STRING         Output directory path
+                                        Default: ${out_dir}
+
+	-i, --min-seq-id     FLOAT          Minimum sequence identity
                                         Default: ${min_seq_id}
 
     -c, --min-coverage   FLOAT          Minimum sequence coverage
@@ -49,7 +60,7 @@ Examples:
     05_mmseqs2_search.sh --min-seq-id 0.7 ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh --min-seq-id 0.7 --min-coverage 0.8 ../results/queries.faa ../results/pyrodigal_out/*.faa
     05_mmseqs2_search.sh ../results/queries.faa ../results/pyrodigal_out/
-    05_mmseqs2_search.sh --search-against gene ../results/queries.faa ../results/pyrodigal_out/
+    05_mmseqs2_search.sh --search-against gene -o ../results/mmseqs2_out/my_favourite_dir ../results/queries.faa ../results/pyrodigal_out/
 EOF
 }
 
@@ -193,13 +204,7 @@ else
 	exit 1
 fi
 
-# Get the path to the script directory and the project directory (bacteria_genome_mining)
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-project_dir="$(dirname "${script_dir}")"
-
-# Create the output directory with the full date and time as a unique code
-time_code=$(date +%Y%m%d%H%M%S)
-out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
+# Create the output directory
 mkdir -p "${out_dir}"
 
 # Define the temporary directory for mmseqs2
