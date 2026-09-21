@@ -25,7 +25,7 @@ out_dir="${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}"
 
 # Set a usage function
 usage() {
-	cat << 'EOF'
+	cat << EOF
 Usage:
     05_mmseqs2_search.sh [options] <query_fasta> <subject_fasta(s)>
     IMPORTANT: Options (flags) must come first if used!
@@ -118,7 +118,7 @@ done
 
 if [ "$#" -lt 2 ]; then
     echo "Error: A query FASTA file and at least one subject FASTA file(s) are required"
-    echo
+    echo "$#"
     usage
     exit 1
 fi
