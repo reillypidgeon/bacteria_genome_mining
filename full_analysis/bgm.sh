@@ -75,6 +75,10 @@ EOF
 # Parse the command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
+		-o|--out-dir)
+            out_dir="$2"
+            shift 2
+            ;;
         -i|--min-seq-id)
             min_seq_id="$2"
             shift 2
@@ -144,31 +148,35 @@ pip install -r ${project_dir}/requirements.txt
 # Call the download and analysis scripts
 bash ${download_scripts_dir}/01_genome_extraction.sh "${taxa[@]}"
 
-bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/"genomes_*_r232.tsv
+bash ${download_scripts_dir}/02_genome_download.sh "${accessions_dir}/"genomes_*_r232.tsv # Figure out the wildcard here
 
 bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
-# Loop through the taxa
-for taxon in "${taxa[@]}"; do
-	echo "Running $taxon"
-	taxon_underscore=$(echo $taxon | tr ' ' '_')
-	echo ${taxon_underscore}
-	accessions_tables="${accessions_dir}/genomes_${taxon_underscore}_r232.tsv"
-	echo ${accessions_tables}
-	
-	while IFS= read -r line; do
-        full_url="${base_url}/${gb_rs}/${first_three}/${second_three}/${third_three}/${accession}_${assembly}/${accession}_${assembly}_genomic.fna.gz"
-        echo "$accession_numbers | $first_three | $second_three | $third_three | $accession | $assembly"
-    done < "${urls_file}"
-done
-
-bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" \
-	--min-seq-id "${min_seq_id}" \
-	--out-dir "${out_dir}"
-	--min-coverage "${min_coverage}" \
-	--search-type ${search_type} \
-	--search-against ${search_against} \
-	"${query_fasta}" \
-	"${subject_fastas_dir}"
+# Loop through the individual gene or protein annotations based on the urls
+while IFS= read -r line; do
+    file_base=$(basename $line .fna.gz)
+    # Build the annotation file name based on the url basename and the search-against flag
+    if [ ${search_against} = "gene" ]; then
+        annotation_file="${subject_fastas_dir}/${file_base}_acc_pyrodigal_gene.fna"
+    else
+        annotation_file="${subject_fastas_dir}/${file_base}_acc_pyrodigal_prot.faa"
+    fi
+    # Check if the annotation file exists and skip if it does not exist
+    if [ -f "${annotation_file}" ]; then
+        echo "Searching ${query_fasta} against ${annotation_file}"
+    else
+        echo "Annotation file not found: ${annotation_file}. Skipping..."
+        continue
+    fi
+    # Run the search if all checks are successful
+    bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --out-dir "${out_dir}" \
+        --min-seq-id "${min_seq_id}" \
+        --out-dir "${out_dir}"
+        --min-coverage "${min_coverage}" \
+        --search-type ${search_type} \
+        --search-against ${search_against} \
+        "${query_fasta}" \
+        "${annotation_file}"
+done < "${urls_file}"
