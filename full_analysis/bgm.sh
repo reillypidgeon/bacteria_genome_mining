@@ -164,7 +164,7 @@ bash ${download_scripts_dir}/03_genome_preparation.sh "${genomes_dir}"
 # Step 04
 bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 
-Step 05
+# Step 05
 # Loop through the individual gene or protein annotations based on the $urls_merged file
 while IFS= read -r line; do
     file_base=$(basename $line .fna.gz)
