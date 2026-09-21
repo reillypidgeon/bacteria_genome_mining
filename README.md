@@ -61,6 +61,8 @@ Most of the analysis requires minimal user input (unless you're running scripts 
   - Example: `"f__Lachnospiraceae"` or `"s__Enterocloster bolteae"` (make sure to quote the taxon for species due to the space)
 
 Optional inputs relate to the mmseqs2 search, which include the following flags:
+- `--out-dir`: Output directory for the mmseqs2 search (STRING | Default: `${project_dir}/results/mmseqs2_out/mmseqs2_search_${time_code}`)
+  - Adds a unique time code formatted according to the YYYYMMDDHHMM
 - `--min-seq-id`: Minimum sequence identity cutoff (FLOAT between 0-1 | Default: `0.5`)
 - `--min-coverage`: Minimum sequence coverage cutoff (FLOAT between 0-1 | Default: `0.5`)
 - `--search-type`: mmseqs2 search type (INT between 0-4 | Default: `0` (automatic) for protein queries and `3` for nucleotide queries). 
