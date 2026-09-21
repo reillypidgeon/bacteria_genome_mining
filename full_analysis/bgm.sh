@@ -149,7 +149,11 @@ bash ${analysis_scripts_dir}/04_pyrodigal_annotations.sh "${genomes_dir}"
 accessions_tables="${accessions_dir}/genomes_${taxa[@]}_r232.tsv" #ADD HERE
 echo ${accessions_tables}
 
-# FOR LOOP GOES HERE
+# 
+for taxon in "${taxa[@]}"; do
+	taxon_underscore=
+	accessions_tables="${accessions_dir}/genomes_${taxon_underscore}_r232.tsv"
+done
 
 bash ${analysis_scripts_dir}/05_mmseqs2_search.sh --min-seq-id "${min_seq_id}" \
 	--min-coverage "${min_coverage}" \
