@@ -9,11 +9,6 @@
 
 set -euo pipefail
 
-echo "Running $0"
-echo "This script searches a user-defined FASTA file against genomes from bacteria, based on user-defined taxonomic levels or species"
-echo "By default, the user-defined query FASTA file will be searched against a predicted protein database for genomes matching the taxon input string(s) and output hits with sequence identity and coverage values of 0.5"
-echo "These default values can be changed by providing flags with the input"
-
 # Start from the directory where sbatch was submitted
 search_dir="${SLURM_SUBMIT_DIR}"
 
