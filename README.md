@@ -1,5 +1,5 @@
 # Bacteria Genome Mining (BGM)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22900171.svg)](https://doi.org/10.5281/zenodo.22900171)
 ## Purpose
 Find homologous sequences (or lack thereof) in genomes for a given taxonomic level, based on GTDB taxonomy (release 232). <br>
 <br>
