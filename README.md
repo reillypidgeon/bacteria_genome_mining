@@ -177,3 +177,10 @@ The following directories will be created within the `bacteria_genome_mining` di
   - `accessions_out`: Contains tab-separated files generated from the GTDB metadata table for specified taxa of interest and URL files for the download step
   - `pyrodigal_out`: Contains gene (`*_pyrodigal_gene.fna`) and protein (`*_pyrodigal_prot.faa`) annotations for all genomes in the `genomes/` directory
   - `mmseqs2_out`: Contains sub-directories with unique timestamps that hold individual mmseqs2 search results and merged search results (including `merged_mmseqs2.tsv` and `merged_best_hits_mmseqs2.tsv`)
+<br>
+Example results can be found in the `examples` directory of this repository. The following code was run in a virtual environment that was set up according to the steps in the **Dependencies** section:
+```
+bash bgm.sh ../examples/queries.faa "s__Enterocloster asparagiformis"
+```
+>[!NOTE]
+> The `results/pyrodigal_out` was omitted from this directory due to file size constraints.
